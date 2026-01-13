@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Building, GraduationCap, Phone, Mail, CheckCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, User, Building, GraduationCap, Phone, Mail, CheckCircle, Loader2, CreditCard } from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import emailjs from '@emailjs/browser';
 import { db } from '../firebase';
 import { EMAIL_CONFIG } from '../emailConfig';
 import Section from './Section';
 import { useAuth } from '../context/AuthContext';
+import { loadRazorpay, RAZORPAY_CONFIG } from '../config/razorpay';
 
 const Register = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { currentUser } = useAuth();
-    const { eventName, category } = location.state || { eventName: '', category: 'Event' };
+    const { eventName, category, price } = location.state || { eventName: '', category: 'Event', price: 0 };
 
     const [formData, setFormData] = useState({
         name: '',
@@ -25,6 +26,7 @@ const Register = () => {
 
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isPaymentLoading, setIsPaymentLoading] = useState(false);
     const [error, setError] = useState('');
 
     useEffect(() => {
@@ -51,10 +53,66 @@ const Register = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async (e) => {
+    const handlePaymentAndSubmit = async (e) => {
         e.preventDefault();
-        setIsLoading(true);
         setError('');
+        setIsPaymentLoading(true);
+
+        try {
+            // 1. Load Razorpay SDK
+            const isLoaded = await loadRazorpay();
+            if (!isLoaded) {
+                setError('Razorpay SDK failed to load. Please check your internet connection.');
+                setIsPaymentLoading(false);
+                return;
+            }
+
+            // 2. Open Razorpay Checkout
+            // For testing we will just simulate success if key is placeholder
+            if (RAZORPAY_CONFIG.key_id === "YOUR_RAZORPAY_KEY") {
+                console.warn("Using placeholder Razorpay key. Simulating success...");
+                // Ensure price is at least 1 for testing if needed, though 0 is fine for free events
+            }
+
+            const options = {
+                key: RAZORPAY_CONFIG.key_id,
+                amount: price * 100, // Amount in paise
+                currency: RAZORPAY_CONFIG.currency,
+                name: RAZORPAY_CONFIG.name,
+                description: `Registration for ${eventName}`,
+                image: "https://citimpulse.com/vite.svg", // Optional: Add your logo URL here
+                handler: async function (response) {
+                    // Payment Success Handler
+                    console.log("Payment Success:", response);
+                    await submitRegistration(response.razorpay_payment_id);
+                },
+                prefill: {
+                    name: formData.name,
+                    email: formData.email,
+                    contact: formData.phone,
+                },
+                theme: {
+                    color: "#2dd4bf", // Electric Teal
+                },
+            };
+
+            const paymentObject = new window.Razorpay(options);
+            paymentObject.on('payment.failed', function (response) {
+                console.error("Payment Failed:", response.error);
+                setError(`Payment Failed: ${response.error.description}`);
+                setIsPaymentLoading(false);
+            });
+
+            paymentObject.open();
+        } catch (err) {
+            console.error("Payment initialization error:", err);
+            setError("Failed to initialize payment.");
+            setIsPaymentLoading(false);
+        }
+    };
+
+    const submitRegistration = async (paymentId) => {
+        setIsLoading(true);
 
         try {
             // 1. Store in Firestore
@@ -62,7 +120,9 @@ const Register = () => {
                 ...formData,
                 eventName,
                 category,
-                uid: currentUser.uid, // Link to user
+                price: price || 0,
+                paymentId: paymentId || 'N/A', // Store payment ID
+                uid: currentUser.uid,
                 registeredAt: serverTimestamp()
             });
 
@@ -70,20 +130,18 @@ const Register = () => {
 
             // 2. Send Email
             try {
-                console.log("Sending email to:", formData.email);
                 await emailjs.send(
                     EMAIL_CONFIG.SERVICE_ID,
                     EMAIL_CONFIG.TEMPLATE_ID,
                     {
                         name: formData.name,
                         email: formData.email,
-                        message: `Registration Details:\nEvent: ${eventName}\nCollege: ${formData.college}\nYear: ${formData.year}\nPhone: ${formData.phone}`,
+                        message: `Registration Confirmed!\nEvent: ${eventName}\nPayment ID: ${paymentId}\nAmount: ₹${price}\nCollege: ${formData.college}\nYear: ${formData.year}\nPhone: ${formData.phone}`,
                         title: `Registration for ${eventName}`,
                         time: new Date().toLocaleString(),
                     },
                     EMAIL_CONFIG.PUBLIC_KEY
                 );
-                console.log('Email sent successfully');
             } catch (emailErr) {
                 console.error('Failed to send email:', emailErr);
             }
@@ -91,9 +149,10 @@ const Register = () => {
             setIsSubmitted(true);
         } catch (err) {
             console.error("Error adding document: ", err);
-            setError('Something went wrong. Please try again.');
+            setError('Payment successful but registration failed. Please contact support with Payment ID: ' + paymentId);
         } finally {
             setIsLoading(false);
+            setIsPaymentLoading(false);
         }
     };
 
@@ -125,9 +184,15 @@ const Register = () => {
                                     <p className="text-gray-400">
                                         You are registering for <span className="text-electric-400 font-bold">{eventName || 'an Event'}</span>
                                     </p>
+                                    {(price !== undefined && price > 0) && (
+                                        <div className="mt-4 bg-electric-500/10 border border-electric-500/20 rounded-lg p-3 inline-flex items-center gap-2 text-electric-300 font-bold">
+                                            <CreditCard size={18} />
+                                            <span>Registration Fee: ₹{price}</span>
+                                        </div>
+                                    )}
                                 </div>
 
-                                <form onSubmit={handleSubmit} className="space-y-6">
+                                <form onSubmit={handlePaymentAndSubmit} className="space-y-6">
                                     {/* Name */}
                                     <div className="space-y-2">
                                         <label className="text-sm font-bold text-gray-300 ml-1">Full Name</label>
@@ -222,15 +287,21 @@ const Register = () => {
                                     {/* Submit Button */}
                                     <button
                                         type="submit"
-                                        disabled={isLoading}
+                                        disabled={isLoading || isPaymentLoading}
                                         className="w-full py-4 mt-8 bg-gradient-to-r from-electric-600 to-electric-400 text-navy-950 font-black text-lg uppercase tracking-widest rounded-xl hover:shadow-[0_0_30px_#2dd4bf] hover:scale-[1.02] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                     >
-                                        {isLoading ? (
+                                        {isLoading || isPaymentLoading ? (
                                             <>
                                                 <Loader2 className="animate-spin" /> Processing...
                                             </>
                                         ) : (
-                                            'Complete Registration'
+                                            <>
+                                                {price > 0 ? (
+                                                    <span>Pay ₹{price} & Register</span>
+                                                ) : (
+                                                    <span>Complete Registration</span>
+                                                )}
+                                            </>
                                         )}
                                     </button>
 
@@ -248,7 +319,7 @@ const Register = () => {
                                 </motion.div>
                                 <h3 className="text-3xl font-bold text-white mb-2">Registration Successful!</h3>
                                 <p className="text-gray-400 mb-8 max-w-md mx-auto">
-                                    Thank you for registering for {eventName}. We have recorded your details and will contact you shortly.
+                                    Thank you for registering for {eventName}. We have received your payment and details.
                                 </p>
                                 <button
                                     onClick={() => navigate('/events')}
