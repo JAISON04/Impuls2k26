@@ -44,7 +44,7 @@
                 'Time limit: 45 minutes.',
                 'Judges decision is final.'
             ],
-            price: 5,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 2
@@ -64,7 +64,7 @@
                 'Circuit diagram will be provided.',
                 'Judges decision is final.'
             ],
-            price: 5,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 1
@@ -84,7 +84,7 @@
                 'Quiz specific rules will be announced on spot.',
                 'Judges decision is final.'
             ],
-            price: 5,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 3
@@ -104,7 +104,7 @@
                 'Presentation time: 7 mins + 3 mins Q&A.',
                 'Judges decision is final.'
             ],
-            price: 5,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 3
@@ -125,7 +125,7 @@
                 'Presentation time: 7 mins + 3 mins Q&A.',
                 'Judges decision is final.'
             ],
-            price: 5,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 3
@@ -145,8 +145,9 @@
                 'Time limit: 1 hour.',
                 'Judges decision is final.'
             ],
-            price: 5,
-            isTeamEvent: false,
+            price: 100,
+            isTeamEvent: true,
+            isFixedPrice: true,
             minTeamSize: 1,
             maxTeamSize: 3
         },
@@ -165,7 +166,7 @@
                 'Laptop required.',
                 'Judges decision is final.'
             ],
-            price: 5,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 2
@@ -203,7 +204,7 @@
                 'Critical thinking required.',
                 'Judges decision is final.'
             ],
-            price: 5,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 2,
             maxTeamSize: 4
@@ -280,7 +281,8 @@
                 'Software installation guide provided.',
                 'Certificates provided upon completion.'
             ],
-            price: 50
+
+            price: 150
         },
         {
             title: 'E-Vehicle',
@@ -297,7 +299,8 @@
                 'Hands-on session included.',
                 'Certificates provided upon completion.'
             ],
-            price: 50
+
+            price: 150
         },
         {
             title: 'Renewable Energy',
@@ -314,7 +317,8 @@
                 'Interactive session with experts.',
                 'Certificates provided upon completion.'
             ],
-            price: 50
+
+            price: 150
         },
         {
             title: 'Code to Cloud: ESP Workshop',
@@ -332,7 +336,8 @@
                 'ESP32/8266 kits provided for session.',
                 'Certificates provided upon completion.'
             ],
-            price: 50
+
+            price: 150
         },
         {
             title: 'Astronomy in Action',
@@ -346,7 +351,8 @@
                 'Interactive session.',
                 'Certificates provided upon completion.'
             ],
-            price: 50
+
+            price: 150
         },
         {
             title: 'Building a MicroSaaS',
@@ -359,7 +365,8 @@
                 'No prior business knowledge needed.',
                 'Certificates provided upon completion.'
             ],
-            price: 50
+
+            price: 150
         },
         {
             title: 'Video Editing Workshop',
@@ -372,7 +379,8 @@
                 'Basic editing knowledge is a plus.',
                 'Certificates provided upon completion.'
             ],
-            price: 50
+
+            price: 150
         }
     ];
 

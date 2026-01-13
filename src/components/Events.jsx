@@ -31,6 +31,7 @@ export const EventDetailsModal = ({ event, onClose }) => {
                 isTeamEvent: event.isTeamEvent || false,
                 minTeamSize: event.minTeamSize || 1,
                 maxTeamSize: event.maxTeamSize || 1,
+                isFixedPrice: event.isFixedPrice || false,
                 rules: event.rules
             }
         });

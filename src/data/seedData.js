@@ -41,7 +41,7 @@ export const eventsData = {
                 'Time limit: 45 minutes.',
                 'Judges decision is final.'
             ],
-            price: 5,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 2
@@ -62,7 +62,7 @@ export const eventsData = {
                 'Circuit diagram will be provided.',
                 'Judges decision is final.'
             ],
-            price: 5,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 1
@@ -83,7 +83,7 @@ export const eventsData = {
                 'Quiz specific rules will be announced on spot.',
                 'Judges decision is final.'
             ],
-            price: 5,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 3
@@ -105,7 +105,7 @@ export const eventsData = {
                 'Presentation time: 7 mins + 3 mins Q&A.',
                 'Judges decision is final.'
             ],
-            price: 5,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 3
@@ -127,7 +127,7 @@ export const eventsData = {
                 'Presentation time: 7 mins + 3 mins Q&A.',
                 'Judges decision is final.'
             ],
-            price: 5,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 3
@@ -148,8 +148,9 @@ export const eventsData = {
                 'Time limit: 1 hour.',
                 'Judges decision is final.'
             ],
-            price: 5,
-            isTeamEvent: false,
+            price: 100,
+            isTeamEvent: true,
+            isFixedPrice: true,
             minTeamSize: 1,
             maxTeamSize: 3
         },
@@ -168,7 +169,7 @@ export const eventsData = {
                 'Laptop required.',
                 'Judges decision is final.'
             ],
-            price: 5,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 2
@@ -187,10 +188,10 @@ export const eventsData = {
                 'Components provided.',
                 'Judges decision is final.'
             ],
-            price: 5,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
-            maxTeamSize: 3
+            maxTeamSize: 2
         },
         {
             id: 9,
@@ -206,7 +207,7 @@ export const eventsData = {
                 'Critical thinking required.',
                 'Judges decision is final.'
             ],
-            price: 5,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 2,
             maxTeamSize: 4
@@ -288,7 +289,8 @@ export const workshopsData = [
             'Laptop is mandatory.',
             'Software installation guide provided.',
             'Certificates provided upon completion.'
-        ]
+        ],
+        price: 150
     },
     {
         id: 2,
@@ -305,7 +307,8 @@ export const workshopsData = [
             'Basic electronics knowledge required.',
             'Hands-on session included.',
             'Certificates provided upon completion.'
-        ]
+        ],
+        price: 150
     },
     {
         id: 3,
@@ -322,7 +325,8 @@ export const workshopsData = [
             'Open to all departments.',
             'Interactive session with experts.',
             'Certificates provided upon completion.'
-        ]
+        ],
+        price: 150
     },
     {
         id: 4,
@@ -340,7 +344,8 @@ export const workshopsData = [
             'Laptop required with USB port.',
             'ESP32/8266 kits provided for session.',
             'Certificates provided upon completion.'
-        ]
+        ],
+        price: 150
     },
     {
         id: 5,
@@ -354,7 +359,8 @@ export const workshopsData = [
             'Interest in space science required.',
             'Interactive session.',
             'Certificates provided upon completion.'
-        ]
+        ],
+        price: 150
     },
     {
         id: 6,
@@ -367,7 +373,8 @@ export const workshopsData = [
             'Laptop required.',
             'No prior business knowledge needed.',
             'Certificates provided upon completion.'
-        ]
+        ],
+        price: 150
     },
     {
         id: 7,
@@ -380,6 +387,7 @@ export const workshopsData = [
             'Laptop with Adobe Premiere/Davinci Resolve suggested.',
             'Basic editing knowledge is a plus.',
             'Certificates provided upon completion.'
-        ]
+        ],
+        price: 150
     }
 ];

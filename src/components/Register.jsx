@@ -51,8 +51,11 @@ const Register = () => {
 
     // Calculate total price based on team size
     const totalPrice = useMemo(() => {
+        if (location.state?.isFixedPrice) {
+            return parseFloat(price) || 0;
+        }
         return teamCount * (parseFloat(price) || 0);
-    }, [teamCount, price]);
+    }, [teamCount, price, location.state]);
 
     useEffect(() => {
         // Redirect if not logged in
@@ -307,10 +310,14 @@ const Register = () => {
                                     {(price !== undefined && price > 0) && (
                                         <div className="mt-4 bg-electric-500/10 border border-electric-500/20 rounded-lg p-3 inline-flex items-center gap-3 text-electric-300 font-bold">
                                             <CreditCard size={18} />
-                                            {isTeamEvent && teamCount > 1 ? (
-                                                <span>{teamCount} × ₹{price} = ₹{totalPrice}</span>
+                                            {location.state?.isFixedPrice ? (
+                                                <span>Fixed Team Price: ₹{totalPrice}</span>
                                             ) : (
-                                                <span>Registration Fee: ₹{price}</span>
+                                                isTeamEvent && teamCount > 1 ? (
+                                                    <span>{teamCount} × ₹{price} = ₹{totalPrice}</span>
+                                                ) : (
+                                                    <span>Registration Fee: ₹{price}</span>
+                                                )
                                             )}
                                         </div>
                                     )}

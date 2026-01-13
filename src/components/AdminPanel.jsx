@@ -27,7 +27,9 @@ const AdminPanel = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [manualForm, setManualForm] = useState({
         name: '', college: '', year: '', phone: '', email: '', eventName: '', price: 5,
+        name: '', college: '', year: '', phone: '', email: '', eventName: '', price: 5,
         isTeamEvent: false,
+        isFixedPrice: false,
         teamCount: 1,
         teamMembers: []
     });
@@ -132,7 +134,12 @@ const AdminPanel = () => {
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            const totalPrice = (manualForm.teamCount || 1) * (parseFloat(manualForm.price) || 5);
+            let totalPrice = 0;
+            if (manualForm.isFixedPrice) {
+                totalPrice = parseFloat(manualForm.price) || 0;
+            } else {
+                totalPrice = (manualForm.teamCount || 1) * (parseFloat(manualForm.price) || 5);
+            }
 
             // 1. Add to Firestore
             const docRef = await addDoc(collection(db, "registrations"), {
@@ -152,7 +159,9 @@ const AdminPanel = () => {
             setIsModalOpen(false);
             setManualForm({
                 name: '', college: '', year: '', phone: '', email: '', eventName: '', price: 5,
+                name: '', college: '', year: '', phone: '', email: '', eventName: '', price: 5,
                 isTeamEvent: false,
+                isFixedPrice: false,
                 teamCount: 1,
                 teamMembers: []
             });
@@ -602,6 +611,7 @@ const AdminPanel = () => {
                                                         eventName: selectedName,
                                                         price: selectedEvent.price || 5,
                                                         isTeamEvent: selectedEvent.isTeamEvent || false,
+                                                        isFixedPrice: selectedEvent.isFixedPrice || false,
                                                         teamCount: (selectedEvent.isTeamEvent || false) ? prev.teamCount : 1,
                                                         // Reset members if switching to non-team event, otherwise keep or adjust
                                                         teamMembers: (selectedEvent.isTeamEvent || false) ? prev.teamMembers : []
@@ -661,13 +671,13 @@ const AdminPanel = () => {
 
                                 <div className="pt-2">
                                     <div className="flex justify-between text-sm mb-2 text-gray-400">
-                                        <span>Price per person:</span>
+                                        <span>{manualForm.isFixedPrice ? 'Fixed Price:' : 'Price per person:'}</span>
                                         <span>₹{manualForm.price}</span>
                                     </div>
                                     <div className="flex justify-between text-lg font-bold text-white">
                                         <span>Total:</span>
                                         <span className="text-electric-400">
-                                            ₹{(manualForm.teamCount || 1) * (parseFloat(manualForm.price) || 0)}
+                                            ₹{manualForm.isFixedPrice ? (parseFloat(manualForm.price) || 0) : ((manualForm.teamCount || 1) * (parseFloat(manualForm.price) || 0))}
                                         </span>
                                     </div>
                                 </div>
