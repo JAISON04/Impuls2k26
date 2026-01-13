@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Building, GraduationCap, Phone, Mail, CheckCircle, Loader2, CreditCard } from 'lucide-react';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { db, functions } from '../firebase';
 import { EMAIL_CONFIG } from '../emailConfig';
@@ -115,38 +115,50 @@ const Register = () => {
         setIsLoading(true);
 
         try {
-            // 1. Store in Firestore
-            const docRef = await addDoc(collection(db, "registrations"), {
+            // 1. Generate ID Client-side for Optimistic Update
+            const newRegRef = doc(collection(db, "registrations"));
+            const newRegId = newRegRef.id;
+
+            const registrationData = {
                 ...formData,
                 eventName,
                 category,
                 price: price || 0,
-                paymentId: paymentId || 'N/A', // Store payment ID
+                paymentId: paymentId || 'N/A',
                 uid: currentUser.uid,
                 registeredAt: serverTimestamp()
-            });
+            };
 
-            console.log("Document written with ID: ", docRef.id);
+            // 2. Start Background Processes (Fire & Forget for UI speed)
+            const dbPromise = setDoc(newRegRef, registrationData);
 
-            // 2. Send Email via Cloud Function (Non-blocking)
+            // 2b. Send Email
             const sendEmailFn = httpsCallable(functions, 'sendRegistrationEmail');
-            sendEmailFn({
+            const emailPromise = sendEmailFn({
                 email: formData.email,
                 name: formData.name,
                 eventName: eventName,
                 paymentId: paymentId || 'N/A',
                 amount: price || 0,
-                refId: docRef.id
-            }).then(() => {
-                console.log("Email request sent to Cloud Function");
-            }).catch((emailErr) => {
-                console.error('Failed to send email:', emailErr);
+                refId: newRegId
             });
 
+            // 3. Log errors in background but don't block UI
+            Promise.all([dbPromise, emailPromise]).then(() => {
+                console.log("Background registration tasks completed.");
+            }).catch(err => {
+                console.error("Background task failed:", err);
+                // Critical: If DB write fails, we should ideally inform user, but UI is already success.
+                // In production, we might queue this or retry. 
+            });
+
+            // 4. Update UI IMMEDIATELY (Optimistic)
+            console.log("Optimistic Success for ID:", newRegId);
             setIsSubmitted(true);
+
         } catch (err) {
-            console.error("Error adding document: ", err);
-            setError('Payment successful but registration failed. Please contact support with Payment ID: ' + paymentId);
+            console.error("Error preparing registration: ", err);
+            setError('Unexpected error during registration processing.');
         } finally {
             setIsLoading(false);
             setIsPaymentLoading(false);

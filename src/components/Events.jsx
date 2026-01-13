@@ -186,7 +186,8 @@ export const eventsData = {
                 'Original photos only.',
                 'No heavy editing allowed.',
                 'Submit before deadline.'
-            ]
+            ],
+            price: 5
         },
         {
             id: 102,
@@ -201,7 +202,8 @@ export const eventsData = {
                 'Original designs only.',
                 'Submit in high resolution.',
                 'Judges decision is final.'
-            ]
+            ],
+            price: 5
         },
         {
             id: 103,
@@ -215,7 +217,8 @@ export const eventsData = {
                 'AI tools allowed.',
                 'Max duration: 2 minutes.',
                 'Judges decision is final.'
-            ]
+            ],
+            price: 5
         }
     ]
 };
