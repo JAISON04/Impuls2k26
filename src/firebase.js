@@ -13,11 +13,14 @@ const firebaseConfig = {
   measurementId: "G-VRDMG0NZF7"
 };
 
+import { getFunctions } from "firebase/functions";
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
 const auth = getAuth(app);
+const functions = getFunctions(app);
 const googleProvider = new GoogleAuthProvider();
 
-export { db, analytics, auth, googleProvider, signInWithPopup, signOut };
+export { db, analytics, auth, googleProvider, signInWithPopup, signOut, functions };

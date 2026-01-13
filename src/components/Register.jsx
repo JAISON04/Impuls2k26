@@ -3,8 +3,8 @@ import { motion } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Building, GraduationCap, Phone, Mail, CheckCircle, Loader2, CreditCard } from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import emailjs from '@emailjs/browser';
-import { db } from '../firebase';
+import { httpsCallable } from 'firebase/functions';
+import { db, functions } from '../firebase';
 import { EMAIL_CONFIG } from '../emailConfig';
 import Section from './Section';
 import { useAuth } from '../context/AuthContext';
@@ -128,22 +128,21 @@ const Register = () => {
 
             console.log("Document written with ID: ", docRef.id);
 
-            // 2. Send Email
+            // 2. Send Email via Cloud Function
             try {
-                await emailjs.send(
-                    EMAIL_CONFIG.SERVICE_ID,
-                    EMAIL_CONFIG.TEMPLATE_ID,
-                    {
-                        name: formData.name,
-                        email: formData.email,
-                        message: `Registration Confirmed!\nEvent: ${eventName}\nPayment ID: ${paymentId}\nAmount: ₹${price}\nCollege: ${formData.college}\nYear: ${formData.year}\nPhone: ${formData.phone}`,
-                        title: `Registration for ${eventName}`,
-                        time: new Date().toLocaleString(),
-                    },
-                    EMAIL_CONFIG.PUBLIC_KEY
-                );
+                const sendEmailFn = httpsCallable(functions, 'sendRegistrationEmail');
+                await sendEmailFn({
+                    email: formData.email,
+                    name: formData.name,
+                    eventName: eventName,
+                    paymentId: paymentId || 'N/A',
+                    amount: price || 0,
+                    refId: docRef.id
+                });
+                console.log("Email request sent to Cloud Function");
             } catch (emailErr) {
                 console.error('Failed to send email:', emailErr);
+                // We don't block success UI if email fails, but we assume the user checks console
             }
 
             setIsSubmitted(true);
