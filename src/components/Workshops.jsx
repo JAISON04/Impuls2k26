@@ -1,135 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Phone, User, Calendar, Clock, MapPin, Laptop, Cpu, Zap, PenTool, Rocket, Cloud, Video } from 'lucide-react';
+import { X, Phone, User, Calendar, Clock, MapPin, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../firebase';
 import Section from './Section';
-
-// Import Workshop Images
-import iot from '../assets/images/imageiot.png';
-import ev from '../assets/images/imageev.png';
-import renewable from '../assets/images/imagerenewable.png';
-import kuka from '../assets/images/imagekuka.png';
-import entrepreneurship from '../assets/images/imageentre.png'; // Reusing for MicroSaaS
-import astronomy from '../assets/images/imageentre.png'; // Reusing for Astronomy (can change if better img found)
-import videoEdit from '../assets/images/imagevideo.png';
-import startup from '../assets/images/imagestartuppitch.png'; // Alternative for MicroSaaS
-
-export const workshopsData = [
-    {
-        id: 1,
-        title: 'Kuka Robotics',
-        image: kuka,
-        desc: 'Hands-on experience with industrial robot arms.',
-        details: 'Master the fundamentals of industrial robotics with KUKA. Learn to program and operate robotic arms used in modern manufacturing.',
-        coordinators: [
-            { name: 'Koushik Raj', contact: '' },
-            { name: 'Rajasubasri', contact: '' },
-            { name: 'Govardhan', contact: '' }
-        ],
-        rules: [
-            'Laptop is mandatory.',
-            'Software installation guide provided.',
-            'Certificates provided upon completion.'
-        ]
-    },
-    {
-        id: 2,
-        title: 'E-Vehicle',
-        image: ev,
-        desc: 'Dive into the future of automotive technology.',
-        details: 'Explore the technology behind Electric Vehicles (EVs). Understand battery management systems, motor control, and EV architecture.',
-        coordinators: [
-            { name: 'Anto Jeba Infant', contact: '6380537819' },
-            { name: 'Sanjeeve', contact: '' },
-            { name: 'Yeswanth K', contact: '' }
-        ],
-        rules: [
-            'Basic electronics knowledge required.',
-            'Hands-on session included.',
-            'Certificates provided upon completion.'
-        ]
-    },
-    {
-        id: 3,
-        title: 'Renewable Energy',
-        image: renewable,
-        desc: 'Harness the power of nature for a sustainable future.',
-        details: 'Learn about sustainable energy solutions including solar, wind, and hybrid systems. Practical insights into renewable energy grid integration.',
-        coordinators: [
-            { name: 'Lokeshwaran', contact: '' },
-            { name: 'Nivash', contact: '' },
-            { name: 'Gopika', contact: '' }
-        ],
-        rules: [
-            'Open to all departments.',
-            'Interactive session with experts.',
-            'Certificates provided upon completion.'
-        ]
-    },
-    {
-        id: 4,
-        title: 'Code to Cloud: ESP Workshop',
-        image: iot,
-        desc: 'From hardware to the cloud - a complete IoT journey.',
-        details: ' Hosted by Club Assymetrics. A comprehensive workshop on IoT using ESP modules. Learn to program microcontrollers and connect them to cloud platforms for real-time data monitoring.',
-        club: 'Club Assymetrics',
-        coordinators: [
-            { name: 'Jaison Binu Frank', contact: '' },
-            { name: 'Shivani Sri', contact: '' },
-            { name: 'Madhubala', contact: '' }
-        ],
-        rules: [
-            'Laptop required with USB port.',
-            'ESP32/8266 kits provided for session.',
-            'Certificates provided upon completion.'
-        ]
-    },
-    {
-        id: 5,
-        title: 'Astronomy in Action',
-        image: astronomy,
-        desc: 'Explore the boundless universe.',
-        details: 'Hosted by Club Callisto. Dive into the world of astronomy. Learn about celestial mechanics, telescopes, and the mysteries of the deep space.',
-        club: 'Club Callisto',
-        coordinators: [],
-        rules: [
-            'Interest in space science required.',
-            'Interactive session.',
-            'Certificates provided upon completion.'
-        ]
-    },
-    {
-        id: 6,
-        title: 'Building a MicroSaaS',
-        image: startup,
-        desc: 'Turn your idea into a profitable product.',
-        details: 'Learn the roadmap to building a MicroSaaS. From ideation and validation to MVP development and scaling. A must-attend for aspiring entrepreneurs.',
-        coordinators: [{ name: "Musha Ahamed", contact: "9092255074" }],
-        rules: [
-            'Laptop required.',
-            'No prior business knowledge needed.',
-            'Certificates provided upon completion.'
-        ]
-    },
-    {
-        id: 7,
-        title: 'Video Editing Workshop',
-        image: videoEdit,
-        desc: 'Edit and create stunning video content.',
-        details: 'Master professional video editing software. Learn cutting, color grading, and effects to create cinematic content like a pro.',
-        coordinators: [],
-        rules: [
-            'Laptop with Adobe Premiere/Davinci Resolve suggested.',
-            'Basic editing knowledge is a plus.',
-            'Certificates provided upon completion.'
-        ]
-    }
-];
 
 const WorkshopDetailsModal = ({ workshop, onClose }) => {
     const navigate = useNavigate();
 
-    React.useEffect(() => {
+    useEffect(() => {
         // Prevent background scrolling when modal is open
         document.body.style.overflow = 'hidden';
         return () => {
@@ -292,7 +172,38 @@ const WorkshopCard = ({ workshop, index, onClick }) => (
 
 const Workshops = ({ previewMode = false }) => {
     const [selectedWorkshop, setSelectedWorkshop] = useState(null);
-    const displayedWorkshops = previewMode ? workshopsData.slice(0, 3) : workshopsData;
+    const [workshops, setWorkshops] = useState([]);
+    const [loading, setLoading] = useState(!previewMode);
+
+    useEffect(() => {
+        const fetchWorkshops = async () => {
+            try {
+                const q = query(collection(db, "workshops"));
+                const querySnapshot = await getDocs(q);
+                const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                setWorkshops(data);
+            } catch (error) {
+                console.error("Error fetching workshops:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchWorkshops();
+    }, [previewMode]);
+
+    const displayedWorkshops = previewMode ? workshops.slice(0, 3) : workshops;
+
+    if (loading) {
+        return (
+            <Section className="py-24 min-h-screen flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="animate-spin text-electric-500" size={48} />
+                    <p className="text-electric-400 font-orbitron tracking-wider">Loading Workshops...</p>
+                </div>
+            </Section>
+        );
+    }
 
     return (
         <Section id="workshops" className="bg-navy-950/50 min-h-screen py-24">

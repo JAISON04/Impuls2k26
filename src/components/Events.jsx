@@ -1,227 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Phone, User, Calendar, Clock, MapPin, Globe, Camera, PenTool, Video, Cpu, Zap, Lock, FileCode, Terminal } from 'lucide-react'; // Added icons
+import { X, Phone, User, Calendar, Clock, MapPin, Globe, Camera, PenTool, Video, Cpu, Zap, Lock, FileCode, Terminal, Loader2 } from 'lucide-react'; // Added icons
 import { useNavigate } from 'react-router-dom';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../firebase';
 import Section from './Section';
 
-// Import Event Images
-import paperPres from '../assets/images/paper presentation.png';
-import projectPres from '../assets/images/imageposter.png';
-import circuitDebug from '../assets/images/imagecircuit.png';
-import wiring from '../assets/images/imagewiring.png';
-import connections from '../assets/images/imageconnection.png';
-import techQuiz from '../assets/images/imagequiz.png';
-import ecad from '../assets/images/cad.avif';
-import photo from '../assets/images/imagephotpo.png'; // For Photography
-import posterDesign from '../assets/images/imageposter.png'; // Reusing for Poster Design
-import aiVideo from '../assets/images/imagevideo.png'; // Reusing for AI Video
-import lastLogin from '../assets/images/imageentre.png'; // Placeholder
-import electrolink from '../assets/images/imageiot.png'; // Placeholder
-import blackout from '../assets/images/imagedebate.png'; // Placeholder
-
-export const eventsData = {
-    technical: [
-        {
-            id: 1,
-            title: 'Circuit Debugging',
-            image: circuitDebug,
-            desc: 'Find the faults and fix the circuits.',
-            details: 'Test your electronics skills by identifying and fixing faults in complex circuits within a time limit. A challenge for the sharpest minds in circuitry.',
-            coordinators: [
-                { name: 'Madan Prakash K S', contact: '98402 15374' },
-                { name: 'Pragadhiswari P', contact: '94448 58213' },
-            ],
-            rules: [
-                'Individual participation or team of 2.',
-                'Debugging tools will be provided.',
-                'Time limit: 45 minutes.',
-                'Judges decision is final.'
-            ],
-            price: 5
-        },
-        {
-            id: 2,
-            title: 'Wiring Challenge',
-            image: wiring,
-            desc: 'Master the art of electrical connections.',
-            details: 'A competition to test your speed and accuracy in electrical wiring and circuit connections. Precision and safety are key.',
-            coordinators: [
-                { name: 'Divainy J', contact: '80725 13973' },
-                { name: 'Dharshini R', contact: '63833 45731' }
-            ],
-            rules: [
-                'Team of 2 members.',
-                'Safety gear (gloves) must be worn.',
-                'Circuit diagram will be provided.',
-                'Judges decision is final.'
-            ]
-        },
-        {
-            id: 3,
-            title: 'Technical Quiz',
-            image: techQuiz,
-            desc: 'Test your technical knowledge.',
-            details: 'Battle of brains! Answer technical questions and prove your expertise in various engineering domains. From basics to advanced concepts.',
-            coordinators: [
-                { name: "R kishore", contact: "63699 02036" },
-                { name: 'Vimal Deep A L', contact: '96297 91556' }
-            ],
-            rules: [
-                'Team of 2 members.',
-                'No electronic gadgets allowed.',
-                'Quiz specific rules will be announced on spot.',
-                'Judges decision is final.'
-            ]
-        },
-        {
-            id: 4,
-            title: 'Paper Presentation',
-            image: paperPres,
-            desc: 'Showcase your innovative ideas and research.',
-            details: 'Present your technical papers on cutting-edge technologies. A platform to share knowledge, innovations, and research findings with a panel of experts.',
-            coordinators: [
-                { name: 'J Jerauld Alwin', contact: '94983 50881' },
-                { name: 'Jaya Sudha', contact: '63827 55248' },
-
-            ],
-            rules: [
-                'Maximum 3 members per team.',
-                'Abstract must be submitted before the deadline.',
-                'Presentation time: 7 mins + 3 mins Q&A.',
-                'Judges decision is final.'
-            ]
-        },
-        {
-            id: 5,
-            title: 'Project Presentation',
-            image: projectPres,
-            desc: 'Visualise your technical concepts creatively.',
-            details: 'Demonstrate your engineering projects and prototypes. Impress the judges with your practical implementation and innovative solutions.',
-            coordinators: [
-                { name: 'Theeran K', contact: '96260 72477' },
-                { name: 'Sudharsan S', contact: '80500 24271' }
-            ],
-            rules: [
-                'Maximum 3 members per team.',
-                'Prototype must be working.',
-                'Power supply will be provided.',
-                'Judges decision is final.'
-            ]
-        },
-        {
-            id: 6,
-            title: 'E-Cadathon',
-            image: ecad,
-            desc: 'Design complex electrical systems.',
-            details: 'Showcase your CAD skills by designing electrical layouts and systems efficiently using industry-standard software.',
-            coordinators: [
-                { name: 'B Bragadeeshwaran', contact: '90428 51602' },
-                { name: "V Mathivanan", contact: "93636 14486" }
-            ],
-            rules: [
-                'Individual participation.',
-                'Software provided: AutoCAD/Eagle.',
-                'Time limit: 1 hour.',
-                'Judges decision is final.'
-            ]
-        },
-        {
-            id: 7,
-            title: 'Last Login',
-            image: lastLogin,
-            desc: 'Unlock the digital mysteries.',
-            details: 'Hosted by Club Celestial. A challenge of logic, coding, and problem-solving. Can you crack the code before time runs out?',
-            club: 'Club Celestial',
-            coordinators: [{ name: "Rudra Prasad M L", contact: "80720 29917" },
-            { name: "Adhisaya", contact: "90428 70525" }
-            ],
-            rules: [
-                'Team of 2 members.',
-                'Laptop required.',
-                'Judges decision is final.'
-            ]
-        },
-        {
-            id: 8,
-            title: 'Electrolink',
-            image: electrolink,
-            desc: 'Forge the connections.',
-            details: 'A circuit design and linking challenge. Understand the flow, connect the components, and make the system live.',
-            coordinators: [{ name: "G Kavin Aravind", contact: "63828 63773" },
-            { name: "T Rajamathi", contact: "87780 03748" }
-            ],
-            rules: [
-                'Team of 2 members.',
-                'Components provided.',
-                'Judges decision is final.'
-            ]
-        },
-        {
-            id: 9,
-            title: 'Blackout Files',
-            image: blackout,
-            desc: 'Decode the hidden data.',
-            details: 'A mystery solving event where technical clues lead to the solution. Analyze the data and find the truth in the blackout.',
-            coordinators: [{ name: "Roseni M", contact: " 73051 08002" },
-            { name: "Shivani Sri S", contact: "91502 04514" }
-            ],
-            rules: [
-                'Team of 2-3 members.',
-                'Critical thinking required.',
-                'Judges decision is final.'
-            ]
-        }
-    ],
-    online: [
-        {
-            id: 101,
-            title: 'Photography',
-            image: photo,
-            desc: 'Capture the moment.',
-            details: 'Showcase your perspective through the lens. Theme-based photography contest where creativity meets composition.',
-            coordinators: [{ name: "Priyadharshini S", contact: "96770 74387" }
-            ],
-            rules: [
-                'Individual participation.',
-                'Original photos only.',
-                'No heavy editing allowed.',
-                'Submit before deadline.'
-            ],
-            price: 5
-        },
-        {
-            id: 102,
-            title: 'Poster Designing',
-            image: posterDesign,
-            desc: 'Design with impact.',
-            details: 'Create compelling visual posters. Combine art and information to convey a powerful message.',
-            coordinators: [{ name: "Rasikka S", contact: "88385 59060" }
-            ],
-            rules: [
-                'Individual participation.',
-                'Original designs only.',
-                'Submit in high resolution.',
-                'Judges decision is final.'
-            ],
-            price: 5
-        },
-        {
-            id: 103,
-            title: 'AI Video Creation',
-            image: aiVideo,
-            desc: 'Generate the future.',
-            details: 'Create amazing videos using AI tools. Push the boundaries of creativity with artificial intelligence.',
-            coordinators: [{ name: "Kasthuri S", contact: "91508 69769" }],
-            rules: [
-                'Individual participation.',
-                'AI tools allowed.',
-                'Max duration: 2 minutes.',
-                'Judges decision is final.'
-            ],
-            price: 5
-        }
-    ]
-};
 
 import { useAuth } from '../context/AuthContext';
 
@@ -404,10 +188,58 @@ export const EventCard = ({ event, onClick }) => {
 const Events = ({ previewMode = false }) => {
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [activeTab, setActiveTab] = useState('technical'); // 'technical' or 'online'
+    const [technicalEvents, setTechnicalEvents] = useState([]);
+    const [onlineEvents, setOnlineEvents] = useState([]);
+    const [loading, setLoading] = useState(!previewMode);
+
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                // Fetch Technical Events
+                const techQuery = query(collection(db, "events"), where("category", "==", "Technical"));
+                const techSnapshot = await getDocs(techQuery);
+                const techData = techSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                // Fetch Online Events
+                const onlineQuery = query(collection(db, "events"), where("category", "==", "Online"));
+                const onlineSnapshot = await getDocs(onlineQuery);
+                const onlineData = onlineSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                setTechnicalEvents(techData);
+                setOnlineEvents(onlineData);
+            } catch (error) {
+                console.error("Error fetching events:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchEvents();
+    }, [previewMode]);
 
     const displayedEvents = previewMode
-        ? eventsData.technical.slice(0, 3)
-        : eventsData[activeTab];
+        ? technicalEvents.slice(0, 3) // This might need adjustment if logic requires specific preview data
+        : (activeTab === 'technical' ? technicalEvents : onlineEvents);
+
+    // Initial load for preview mode if needed or just use current state if available. 
+    // Actually for preview mode reusing fetched data or passed props is better. 
+    // For now assuming previewMode might just use what we have or we can fetch a few.
+    // Let's keep it simple: if previewMode, maybe we just don't load? 
+    // Or we should fetch just a few?
+    // The previous code used imported data. 
+    // Let's fetch all for simplicity now, or maybe the parent passes data?
+    // For now, let's just fetch all.
+
+    if (loading) {
+        return (
+            <Section className="py-24 min-h-screen flex items-center justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="animate-spin text-electric-500" size={48} />
+                    <p className="text-electric-400 font-orbitron tracking-wider">Loading Events...</p>
+                </div>
+            </Section>
+        );
+    }
 
     return (
         <Section id="events" className="py-24">
