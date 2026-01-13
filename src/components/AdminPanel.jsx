@@ -144,22 +144,30 @@ const AdminPanel = () => {
         }
     };
 
-    const handleSendOD = async (student) => {
-        if (!confirm(`Send OD Letter to ${student.name}?`)) return;
+    const handleGenerateOD = async (student) => {
+        if (!confirm(`Generate OD Letter for ${student.name}?`)) return;
 
         setSendingOD(student.id);
         try {
-            const sendOD = httpsCallable(functions, 'sendODEmail');
-            await sendOD({
-                email: student.email,
-                name: student.name,
-                college: student.college,
-                eventDate: 'March 20, 2026'
-            });
-            alert(`OD Letter sent to ${student.name}`);
+            // Update Firestore to mark OD as generated
+            const regRef = doc(db, 'registrations', student.id);
+            await setDoc(regRef, {
+                odGenerated: true,
+                odGeneratedAt: serverTimestamp()
+            }, { merge: true });
+
+            // Update local state
+            setRegistrations(prev => prev.map(r =>
+                r.id === student.id ? { ...r, odGenerated: true } : r
+            ));
+            setFilteredData(prev => prev.map(r =>
+                r.id === student.id ? { ...r, odGenerated: true } : r
+            ));
+
+            alert(`OD Letter generated for ${student.name}. They can now download it from their profile.`);
         } catch (err) {
             console.error(err);
-            alert(`Failed to send OD email: ${err.message}`);
+            alert(`Failed to generate OD: ${err.message}`);
         } finally {
             setSendingOD(null);
         }
@@ -418,14 +426,20 @@ const AdminPanel = () => {
                                             <td className="p-4">{reg.year}</td>
                                             <td className="p-4 text-gray-500 text-xs whitespace-nowrap">{reg.registeredAt}</td>
                                             <td className="p-4">
-                                                <button
-                                                    onClick={() => handleSendOD(reg)}
-                                                    disabled={sendingOD === reg.id}
-                                                    className="bg-navy-800 hover:bg-navy-700 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-white/10 flex items-center gap-2"
-                                                >
-                                                    {sendingOD === reg.id ? <Loader2 className="animate-spin" size={14} /> : <FileText size={14} />}
-                                                    Send OD
-                                                </button>
+                                                {reg.odGenerated ? (
+                                                    <span className="bg-green-500/10 text-green-400 px-3 py-1.5 rounded-lg text-xs font-bold border border-green-500/20 flex items-center gap-2 w-fit">
+                                                        <CheckCircle size={14} /> OD Ready
+                                                    </span>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => handleGenerateOD(reg)}
+                                                        disabled={sendingOD === reg.id}
+                                                        className="bg-navy-800 hover:bg-navy-700 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-white/10 flex items-center gap-2"
+                                                    >
+                                                        {sendingOD === reg.id ? <Loader2 className="animate-spin" size={14} /> : <FileText size={14} />}
+                                                        Generate OD
+                                                    </button>
+                                                )}
                                             </td>
                                         </tr>
                                     ))

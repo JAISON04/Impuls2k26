@@ -16,7 +16,7 @@ const brevoClient = new Brevo.TransactionalEmailsApi();
 // You should set this via: firebase functions:secrets:set BREVO_API_KEY
 // For now, we'll assume it's passed or env var, or hardcoded (discouraged).
 // We will use process.env.BREVO_KEY for safety.
-const BREVO_KEY = process.env.BREVO_KEY || "bskoE9LLAnki7An";
+const BREVO_KEY = process.env.BREVO_KEY;
 
 brevoClient.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, BREVO_KEY);
 

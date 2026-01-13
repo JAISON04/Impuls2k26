@@ -4,8 +4,9 @@ import { db } from '../firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import Section from './Section';
 import { motion } from 'framer-motion';
-import { Calendar, User, LogOut, Mail, Phone, Clock, MapPin, Loader2, Award } from 'lucide-react';
+import { Calendar, User, LogOut, Mail, Phone, Clock, MapPin, Loader2, Award, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import generateODPdf from '../utils/generateODPdf';
 
 const Profile = () => {
     const { currentUser, logout } = useAuth();
@@ -51,6 +52,17 @@ const Profile = () => {
         } catch (error) {
             console.error("Failed to log out", error);
         }
+    };
+
+    const handleDownloadOD = (event) => {
+        generateODPdf({
+            name: event.name,
+            college: event.college,
+            year: event.year,
+            eventName: event.eventName,
+            refId: event.id,
+            registeredAt: event.registeredAt?.toDate ? event.registeredAt.toDate().toLocaleDateString() : 'N/A'
+        });
     };
 
     if (!currentUser) {
@@ -171,6 +183,24 @@ const Profile = () => {
                                         </div>
                                     </div>
                                     <div className="h-1 w-full bg-gradient-to-r from-electric-500 to-transparent opacity-50" />
+
+                                    {/* OD Download Section */}
+                                    <div className="p-4 bg-navy-950/50 border-t border-white/5">
+                                        {event.odGenerated ? (
+                                            <button
+                                                onClick={() => handleDownloadOD(event)}
+                                                className="w-full px-4 py-2 bg-green-500/10 border border-green-500/30 rounded-lg text-green-400 hover:bg-green-500/20 transition-colors flex items-center justify-center gap-2 font-bold text-sm"
+                                            >
+                                                <Download size={16} />
+                                                Download OD Letter
+                                            </button>
+                                        ) : (
+                                            <div className="w-full px-4 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-yellow-400 flex items-center justify-center gap-2 text-sm">
+                                                <Clock size={16} />
+                                                OD Letter Pending
+                                            </div>
+                                        )}
+                                    </div>
                                 </motion.div>
                             ))}
                         </div>
