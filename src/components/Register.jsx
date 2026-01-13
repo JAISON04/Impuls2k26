@@ -340,8 +340,8 @@ const Register = () => {
                                         </div>
                                     </div>
 
-                                    {/* Team Size Selector - For all team events */}
-                                    {isTeamEvent && minTeamSize > 1 && (
+                                    {/* Team Size Selector - For all team events where team size can grow */}
+                                    {isTeamEvent && maxTeamSize > 1 && (
                                         <div className="space-y-2">
                                             <label className="text-sm font-bold text-gray-300 ml-1">Number of Participants</label>
                                             <div className="flex items-center gap-4">
