@@ -13,6 +13,7 @@ import Workshops from './components/Workshops';
 import OnlineEvents from './components/OnlineEvents';
 import Register from './components/Register';
 import AdminPanel from './components/AdminPanel';
+import Profile from './components/Profile';
 import DepartmentAchievements from './components/DepartmentAchievements';
 import Coordinators from './components/Coordinators';
 import Footer from './components/Footer';
@@ -66,6 +67,7 @@ function App() {
               <Route path="/workshops" element={<Workshops />} />
               <Route path="/online-events" element={<OnlineEvents />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="/admin-downloads" element={<AdminPanel />} />
             </Routes>
           </motion.div>

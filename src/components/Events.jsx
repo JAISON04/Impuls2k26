@@ -219,8 +219,11 @@ export const eventsData = {
     ]
 };
 
+import { useAuth } from '../context/AuthContext';
+
 export const EventDetailsModal = ({ event, onClose }) => {
     const navigate = useNavigate();
+    const { currentUser, googleSignIn } = useAuth();
 
     useEffect(() => {
         document.body.style.overflow = 'hidden';
@@ -322,12 +325,21 @@ export const EventDetailsModal = ({ event, onClose }) => {
                         </div>
                     )}
 
-                    <button
-                        onClick={handleRegister}
-                        className="w-full py-4 bg-gradient-to-r from-electric-600 to-electric-400 text-navy-950 font-black text-lg uppercase tracking-widest rounded-xl hover:shadow-[0_0_30px_#2dd4bf] hover:scale-[1.02] transition-all"
-                    >
-                        Register Now
-                    </button>
+                    {currentUser ? (
+                        <button
+                            onClick={handleRegister}
+                            className="w-full py-4 bg-gradient-to-r from-electric-600 to-electric-400 text-navy-950 font-black text-lg uppercase tracking-widest rounded-xl hover:shadow-[0_0_30px_#2dd4bf] hover:scale-[1.02] transition-all"
+                        >
+                            Register Now
+                        </button>
+                    ) : (
+                        <button
+                            onClick={googleSignIn}
+                            className="w-full py-4 bg-transparent border-2 border-electric-500 text-electric-400 font-black text-lg uppercase tracking-widest rounded-xl hover:bg-electric-500 hover:text-navy-950 transition-all flex items-center justify-center gap-2"
+                        >
+                            <User size={20} /> Sign In to Register
+                        </button>
+                    )}
                 </div>
             </motion.div>
         </motion.div>

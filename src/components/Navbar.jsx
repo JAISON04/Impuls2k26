@@ -61,7 +61,7 @@ const Navbar = () => {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="fixed top-0 left-0 right-0 z-50 w-full bg-navy-950/80 backdrop-blur-xl border-b border-white/10 shadow-lg"
         >
-            <div className="w-full px-8 py-4 flex items-center justify-between relative overflow-hidden group/nav">
+            <div className="w-full px-4 md:px-8 py-4 flex items-center justify-between relative overflow-hidden group/nav">
 
                 {/* Glass sheen effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover/nav:animate-shimmer pointer-events-none" />
@@ -74,7 +74,7 @@ const Navbar = () => {
                 >
                     <div className="relative">
                         <div className="absolute inset-0 bg-electric-400 blur-lg opacity-20 group-hover:opacity-40 transition-opacity" />
-                        <img src={logo} alt="Impulse" className="h-10 w-auto relative z-10 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]" />
+                        <img src={logo} alt="Impulse" className="h-8 md:h-10 w-auto relative z-10 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]" />
                     </div>
                 </Link>
 
@@ -86,7 +86,7 @@ const Navbar = () => {
                             href={link.path}
                             onClick={(e) => handleNavigation(e, link)}
                             className={`
-                                    relative px-5 py-2.5 rounded-xl text-sm font-medium tracking-wide transition-all duration-300
+                                    relative px-4 lg:px-5 py-2.5 rounded-xl text-sm font-medium tracking-wide transition-all duration-300
                                     ${location.pathname === link.path && link.type !== 'hash'
                                     ? 'text-navy-950 bg-electric-400 font-bold shadow-[0_0_20px_rgba(45,212,191,0.4)]'
                                     : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -97,16 +97,22 @@ const Navbar = () => {
                         </a>
                     ))}
 
-
+                    {/* Auth Status Section (Desktop) */}
+                    <div className="ml-4 pl-4 border-l border-white/10">
+                        <AuthStatus />
+                    </div>
                 </div>
 
                 {/* Mobile Menu Button */}
-                <button
-                    onClick={toggleMenu}
-                    className="md:hidden relative z-10 p-2 text-gray-300 hover:text-white bg-white/5 rounded-lg transition-colors border border-white/5"
-                >
-                    {isOpen ? <X size={24} /> : <Menu size={24} />}
-                </button>
+                <div className="flex items-center gap-4 md:hidden">
+                    <AuthStatus mobile={true} />
+                    <button
+                        onClick={toggleMenu}
+                        className="relative z-10 p-2 text-gray-300 hover:text-white bg-white/5 rounded-lg transition-colors border border-white/5"
+                    >
+                        {isOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
+                </div>
             </div>
 
             {/* Mobile Menu Overlay */}
@@ -144,5 +150,54 @@ const Navbar = () => {
         </motion.nav >
     );
 };
+
+// Sub-component for Auth Status
+import { useAuth } from '../context/AuthContext';
+import { User } from 'lucide-react';
+
+const AuthStatus = ({ mobile }) => {
+    const { currentUser, googleSignIn } = useAuth();
+    const navigate = useNavigate();
+
+    const handleProfileClick = () => {
+        navigate('/profile');
+    };
+
+    if (currentUser) {
+        return (
+            <button
+                onClick={handleProfileClick}
+                className={`flex items-center gap-2 group ${mobile ? 'mr-2' : ''}`}
+            >
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full border border-electric-500/50 overflow-hidden shadow-[0_0_10px_rgba(45,212,191,0.2)] group-hover:border-electric-400 transition-all">
+                    <img
+                        src={currentUser.photoURL}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                    />
+                </div>
+                {!mobile && (
+                    <div className="text-left hidden lg:block">
+                        <div className="text-xs text-gray-400 group-hover:text-electric-400 transition-colors">Hello,</div>
+                        <div className="text-sm font-bold text-white leading-none max-w-[100px] truncate">{currentUser.displayName.split(' ')[0]}</div>
+                    </div>
+                )}
+            </button>
+        );
+    }
+
+    return (
+        <button
+            onClick={googleSignIn}
+            className={`
+                flex items-center gap-2 bg-white/5 hover:bg-electric-500 hover:text-navy-950 text-electric-400 border border-electric-500/30 px-4 py-2 rounded-lg transition-all font-bold text-xs md:text-sm uppercase tracking-wider
+                ${mobile ? 'mr-0' : ''}
+            `}
+        >
+            <User size={16} /> <span className={mobile ? 'hidden' : 'inline'}>Sign In</span>
+        </button>
+    );
+};
+
 
 export default Navbar;

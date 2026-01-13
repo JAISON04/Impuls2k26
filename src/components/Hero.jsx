@@ -401,6 +401,8 @@ const Hero = () => {
                 >
                     Department of EEE | Chennai Institute of Technology
                 </motion.p>
+
+                <HeroAuthButton />
             </div>
 
             {/* Scroll Indicator */}
@@ -414,6 +416,44 @@ const Hero = () => {
                 </div>
             </motion.div>
         </section>
+    );
+};
+
+// Sub-component for Auth Button
+import { useAuth } from '../context/AuthContext';
+import { User, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+const HeroAuthButton = () => {
+    const { currentUser, googleSignIn } = useAuth();
+    const navigate = useNavigate();
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 4, duration: 0.8 }}
+            className="mt-8"
+        >
+            {currentUser ? (
+                <button
+                    onClick={() => navigate('/events')}
+                    className="px-8 py-3 bg-electric-600 hover:bg-electric-500 text-navy-950 font-bold text-lg rounded-xl flex items-center gap-2 hover:scale-105 transition-all shadow-[0_0_30px_rgba(45,212,191,0.4)]"
+                >
+                    Explore Events <ArrowRight size={20} />
+                </button>
+            ) : (
+                <button
+                    onClick={googleSignIn}
+                    className="group relative px-8 py-3 bg-transparent border border-electric-500 text-electric-400 font-bold text-lg rounded-xl overflow-hidden hover:text-navy-950 transition-colors"
+                >
+                    <div className="absolute inset-0 bg-electric-500 -translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
+                    <span className="relative flex items-center gap-2">
+                        <User size={20} /> Sign In with Google
+                    </span>
+                </button>
+            )}
+        </motion.div>
     );
 };
 

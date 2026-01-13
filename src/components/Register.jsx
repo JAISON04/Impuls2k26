@@ -7,10 +7,12 @@ import emailjs from '@emailjs/browser';
 import { db } from '../firebase';
 import { EMAIL_CONFIG } from '../emailConfig';
 import Section from './Section';
+import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const { currentUser } = useAuth();
     const { eventName, category } = location.state || { eventName: '', category: 'Event' };
 
     const [formData, setFormData] = useState({
@@ -26,13 +28,24 @@ const Register = () => {
     const [error, setError] = useState('');
 
     useEffect(() => {
+        // Redirect if not logged in
+        if (!currentUser) {
+            navigate('/');
+            return;
+        }
+
+        // Auto-fill from Auth
+        setFormData(prev => ({
+            ...prev,
+            name: currentUser.displayName || '',
+            email: currentUser.email || ''
+        }));
+
         // Redirect to events if no state is present (direct access)
         if (!location.state) {
             // navigate('/events'); 
-            // Optional: allow direct access but just show empty form? 
-            // Better to redirect or let them choose. For now, let's keep it open but generic.
         }
-    }, [location, navigate]);
+    }, [location, navigate, currentUser]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -49,6 +62,7 @@ const Register = () => {
                 ...formData,
                 eventName,
                 category,
+                uid: currentUser.uid, // Link to user
                 registeredAt: serverTimestamp()
             });
 
@@ -124,9 +138,8 @@ const Register = () => {
                                                 name="name"
                                                 required
                                                 value={formData.name}
-                                                onChange={handleChange}
-                                                placeholder="John Doe"
-                                                className="w-full bg-navy-950 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:border-electric-500 focus:ring-1 focus:ring-electric-500 outline-none transition-all placeholder:text-gray-700"
+                                                readOnly
+                                                className="w-full bg-navy-950/50 border border-white/5 rounded-xl py-3 pl-12 pr-4 text-gray-400 cursor-not-allowed outline-none"
                                             />
                                         </div>
                                     </div>
@@ -200,9 +213,8 @@ const Register = () => {
                                                 name="email"
                                                 required
                                                 value={formData.email}
-                                                onChange={handleChange}
-                                                placeholder="john@example.com"
-                                                className="w-full bg-navy-950 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:border-electric-500 focus:ring-1 focus:ring-electric-500 outline-none transition-all placeholder:text-gray-700"
+                                                readOnly
+                                                className="w-full bg-navy-950/50 border border-white/5 rounded-xl py-3 pl-12 pr-4 text-gray-400 cursor-not-allowed outline-none"
                                             />
                                         </div>
                                     </div>
