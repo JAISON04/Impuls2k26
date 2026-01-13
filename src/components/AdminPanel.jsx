@@ -63,7 +63,7 @@ const AdminPanel = () => {
     };
 
     const calculateStats = (data) => {
-        const unique participants = new Set(data.map(item => item.phone)).size;
+        const participants = new Set(data.map(item => item.phone)).size;
         setStats({
             total: data.length,
             unique: participants,
