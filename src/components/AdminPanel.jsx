@@ -587,8 +587,47 @@ const AdminPanel = () => {
                                     </div>
                                     <div>
                                         <label className="text-xs font-bold text-gray-400 uppercase">Event</label>
-                                        <input required type="text" className="w-full bg-navy-950 border border-white/10 rounded-lg px-3 py-2 text-white outline-none focus:border-electric-500"
-                                            value={manualForm.eventName} onChange={e => setManualForm({ ...manualForm, eventName: e.target.value })} placeholder="Event Name" />
+                                        <select
+                                            required
+                                            className="w-full bg-navy-950 border border-white/10 rounded-lg px-3 py-2 text-white outline-none focus:border-electric-500"
+                                            value={manualForm.eventName}
+                                            onChange={(e) => {
+                                                const selectedName = e.target.value;
+                                                const allEvents = [...eventsData.technical, ...eventsData.online, ...workshopsData];
+                                                const selectedEvent = allEvents.find(ev => ev.title === selectedName);
+
+                                                if (selectedEvent) {
+                                                    setManualForm(prev => ({
+                                                        ...prev,
+                                                        eventName: selectedName,
+                                                        price: selectedEvent.price || 5,
+                                                        isTeamEvent: selectedEvent.isTeamEvent || false,
+                                                        teamCount: (selectedEvent.isTeamEvent || false) ? prev.teamCount : 1,
+                                                        // Reset members if switching to non-team event, otherwise keep or adjust
+                                                        teamMembers: (selectedEvent.isTeamEvent || false) ? prev.teamMembers : []
+                                                    }));
+                                                } else {
+                                                    setManualForm(prev => ({ ...prev, eventName: selectedName }));
+                                                }
+                                            }}
+                                        >
+                                            <option value="">Select Event</option>
+                                            <optgroup label="Technical Events">
+                                                {eventsData.technical.map(ev => (
+                                                    <option key={ev.id} value={ev.title}>{ev.title}</option>
+                                                ))}
+                                            </optgroup>
+                                            <optgroup label="Online Events">
+                                                {eventsData.online.map(ev => (
+                                                    <option key={ev.id} value={ev.title}>{ev.title}</option>
+                                                ))}
+                                            </optgroup>
+                                            <optgroup label="Workshops">
+                                                {workshopsData.map(ws => (
+                                                    <option key={ws.id} value={ws.title}>{ws.title}</option>
+                                                ))}
+                                            </optgroup>
+                                        </select>
                                     </div>
                                 </div>
 
