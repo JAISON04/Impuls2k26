@@ -1,5 +1,5 @@
 export const RAZORPAY_CONFIG = {
-    key_id: "YOUR_RAZORPAY_KEY", // Placeholder - User to replace
+    key_id: "rzp_live_S1d0uE6OLaE5LR",
     name: "Impulse 2026",
     currency: "INR",
 };
