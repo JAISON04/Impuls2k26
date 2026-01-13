@@ -5,6 +5,7 @@ import { EventCard, EventDetailsModal } from './Events';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Loader2 } from 'lucide-react';
+import { getImageByTitle } from '../utils/imageMap';
 
 const OnlineEvents = () => {
     const [selectedEvent, setSelectedEvent] = useState(null);
@@ -16,7 +17,11 @@ const OnlineEvents = () => {
             try {
                 const q = query(collection(db, "events"), where("category", "==", "Online"));
                 const querySnapshot = await getDocs(q);
-                const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const data = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data(),
+                    image: getImageByTitle(doc.data().title) // Resolve image
+                }));
                 setOnlineEvents(data);
             } catch (error) {
                 console.error("Error fetching online events:", error);

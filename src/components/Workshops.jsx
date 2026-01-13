@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Phone, User, Calendar, Clock, MapPin, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import Section from './Section';
+import { getImageByTitle } from '../utils/imageMap';
 
 const WorkshopDetailsModal = ({ workshop, onClose }) => {
     const navigate = useNavigate();
@@ -180,7 +181,11 @@ const Workshops = ({ previewMode = false }) => {
             try {
                 const q = query(collection(db, "workshops"));
                 const querySnapshot = await getDocs(q);
-                const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const data = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data(),
+                    image: getImageByTitle(doc.data().title) // Resolve image
+                }));
                 setWorkshops(data);
             } catch (error) {
                 console.error("Error fetching workshops:", error);

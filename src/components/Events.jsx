@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import Section from './Section';
-
+import { getImageByTitle } from '../utils/imageMap';
 
 import { useAuth } from '../context/AuthContext';
 
@@ -198,12 +198,20 @@ const Events = ({ previewMode = false }) => {
                 // Fetch Technical Events
                 const techQuery = query(collection(db, "events"), where("category", "==", "Technical"));
                 const techSnapshot = await getDocs(techQuery);
-                const techData = techSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const techData = techSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data(),
+                    image: getImageByTitle(doc.data().title) // Resolve image
+                }));
 
                 // Fetch Online Events
                 const onlineQuery = query(collection(db, "events"), where("category", "==", "Online"));
                 const onlineSnapshot = await getDocs(onlineQuery);
-                const onlineData = onlineSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const onlineData = onlineSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data(),
+                    image: getImageByTitle(doc.data().title) // Resolve image
+                }));
 
                 setTechnicalEvents(techData);
                 setOnlineEvents(onlineData);
