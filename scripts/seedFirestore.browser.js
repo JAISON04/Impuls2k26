@@ -44,7 +44,10 @@
                 'Time limit: 45 minutes.',
                 'Judges decision is final.'
             ],
-            price: 5
+            price: 5,
+            isTeamEvent: true,
+            minTeamSize: 1,
+            maxTeamSize: 2
         },
         {
             title: 'Wiring Challenge',
@@ -61,7 +64,10 @@
                 'Circuit diagram will be provided.',
                 'Judges decision is final.'
             ],
-            price: 5
+            price: 5,
+            isTeamEvent: true,
+            minTeamSize: 2,
+            maxTeamSize: 2
         },
         {
             title: 'Technical Quiz',
@@ -78,7 +84,10 @@
                 'Quiz specific rules will be announced on spot.',
                 'Judges decision is final.'
             ],
-            price: 5
+            price: 5,
+            isTeamEvent: true,
+            minTeamSize: 2,
+            maxTeamSize: 2
         },
         {
             title: 'Paper Presentation',
@@ -95,7 +104,10 @@
                 'Presentation time: 7 mins + 3 mins Q&A.',
                 'Judges decision is final.'
             ],
-            price: 5
+            price: 5,
+            isTeamEvent: true,
+            minTeamSize: 1,
+            maxTeamSize: 3
         },
         {
             title: 'Project Presentation',
@@ -113,7 +125,10 @@
                 'Presentation time: 7 mins + 3 mins Q&A.',
                 'Judges decision is final.'
             ],
-            price: 5
+            price: 5,
+            isTeamEvent: true,
+            minTeamSize: 1,
+            maxTeamSize: 3
         },
         {
             title: 'E-Cadathon',
@@ -130,7 +145,10 @@
                 'Time limit: 1 hour.',
                 'Judges decision is final.'
             ],
-            price: 5
+            price: 5,
+            isTeamEvent: false,
+            minTeamSize: 1,
+            maxTeamSize: 1
         },
         {
             title: 'Last Login',
@@ -147,7 +165,10 @@
                 'Laptop required.',
                 'Judges decision is final.'
             ],
-            price: 5
+            price: 5,
+            isTeamEvent: true,
+            minTeamSize: 2,
+            maxTeamSize: 2
         },
         {
             title: 'Electrolink',
@@ -163,7 +184,10 @@
                 'Components provided.',
                 'Judges decision is final.'
             ],
-            price: 5
+            price: 5,
+            isTeamEvent: true,
+            minTeamSize: 2,
+            maxTeamSize: 2
         },
         {
             title: 'Blackout Files',
@@ -179,7 +203,10 @@
                 'Critical thinking required.',
                 'Judges decision is final.'
             ],
-            price: 5
+            price: 5,
+            isTeamEvent: true,
+            minTeamSize: 2,
+            maxTeamSize: 3
         }
     ];
 
@@ -196,7 +223,10 @@
                 'No heavy editing allowed.',
                 'Submit before deadline.'
             ],
-            price: 5
+            price: 5,
+            isTeamEvent: false,
+            minTeamSize: 1,
+            maxTeamSize: 1
         },
         {
             title: 'Poster Designing',
@@ -210,7 +240,10 @@
                 'Submit in high resolution.',
                 'Judges decision is final.'
             ],
-            price: 5
+            price: 5,
+            isTeamEvent: false,
+            minTeamSize: 1,
+            maxTeamSize: 1
         },
         {
             title: 'AI Video Creation',
@@ -224,7 +257,10 @@
                 'Max duration: 2 minutes.',
                 'Judges decision is final.'
             ],
-            price: 5
+            price: 5,
+            isTeamEvent: false,
+            minTeamSize: 1,
+            maxTeamSize: 1
         }
     ];
 
@@ -342,10 +378,20 @@
 
     console.log('🌱 Starting Firestore seed...\n');
 
+    const { getDocs, deleteDoc, doc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+
+    // Delete existing events first
+    console.log('🗑️ Clearing existing events...');
+    const existingEvents = await getDocs(collection(db, 'events'));
+    for (const docSnapshot of existingEvents.docs) {
+        await deleteDoc(doc(db, 'events', docSnapshot.id));
+    }
+    console.log(`   Deleted ${existingEvents.docs.length} existing events`);
+
     let count = 0;
 
     // Seed Technical Events
-    console.log('📌 Seeding Technical Events...');
+    console.log('\n📌 Seeding Technical Events...');
     for (const event of technicalEvents) {
         await addDoc(collection(db, 'events'), {
             ...event,

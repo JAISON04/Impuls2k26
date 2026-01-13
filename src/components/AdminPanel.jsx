@@ -4,7 +4,7 @@ import { httpsCallable } from 'firebase/functions';
 import { db, functions } from '../firebase';
 import { eventsData, workshopsData } from '../data/seedData';
 import * as XLSX from 'xlsx';
-import { Download, Table, Loader2, AlertCircle, Users, IndianRupee, FileText, Search, LogOut, CheckCircle, Database } from 'lucide-react';
+import { Download, Table, Loader2, AlertCircle, Users, IndianRupee, FileText, Search, LogOut, CheckCircle, Database, Plus, Minus, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Section from './Section';
 
@@ -26,7 +26,10 @@ const AdminPanel = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [manualForm, setManualForm] = useState({
-        name: '', college: '', year: '', phone: '', email: '', eventName: '', price: 5
+        name: '', college: '', year: '', phone: '', email: '', eventName: '', price: 5,
+        isTeamEvent: false,
+        teamCount: 1,
+        teamMembers: []
     });
 
     // OD State
@@ -80,15 +83,24 @@ const AdminPanel = () => {
 
         // Calculate event breakdown
         const breakdown = {};
+        let totalRevenue = 0;
+
         data.forEach(item => {
             const event = item.eventName || 'Unknown';
-            breakdown[event] = (breakdown[event] || 0) + 1;
+            breakdown[event] = (breakdown[event] || 0) + (item.teamCount || 1);
+
+            // Calculate revenue carefully
+            if (item.totalPrice) {
+                totalRevenue += parseFloat(item.totalPrice);
+            } else {
+                totalRevenue += (item.teamCount || 1) * 5; // Fallback
+            }
         });
 
         setStats({
             total: data.length,
             unique: participants,
-            revenue: data.length * REGISTRATION_FEE,
+            revenue: totalRevenue,
             eventBreakdown: breakdown
         });
     };
@@ -120,9 +132,13 @@ const AdminPanel = () => {
         e.preventDefault();
         setIsSubmitting(true);
         try {
+            const totalPrice = (manualForm.teamCount || 1) * (parseFloat(manualForm.price) || 5);
+
             // 1. Add to Firestore
             const docRef = await addDoc(collection(db, "registrations"), {
                 ...manualForm,
+                teamMembers: manualForm.isTeamEvent ? manualForm.teamMembers : [], // Only save if team event
+                totalPrice: totalPrice,
                 category: 'Manual',
                 paymentId: 'MANUAL',
                 uid: 'ADMIN_ENTRY',
@@ -134,14 +150,44 @@ const AdminPanel = () => {
 
             // 3. Reset & Close
             setIsModalOpen(false);
-            setManualForm({ name: '', college: '', year: '', phone: '', email: '', eventName: '', price: 5 });
-            alert("Student registered successfully!");
+            setManualForm({
+                name: '', college: '', year: '', phone: '', email: '', eventName: '', price: 5,
+                isTeamEvent: false,
+                teamCount: 1,
+                teamMembers: []
+            });
+            alert("Student/Team registered successfully!");
         } catch (err) {
             console.error(err);
             alert("Failed to register student.");
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    // Helper to update team member at index
+    const updateTeamMember = (index, value) => {
+        const updated = [...manualForm.teamMembers];
+        updated[index] = { name: value };
+        setManualForm({ ...manualForm, teamMembers: updated });
+    };
+
+    // Helper to adjust team count
+    const adjustTeamCount = (delta) => {
+        const newCount = Math.max(1, (manualForm.teamCount || 1) + delta);
+        // Resize members array
+        let newMembers = [...manualForm.teamMembers];
+        if (newCount > newMembers.length + 1) { // +1 because main student is member 1
+            // Add slots
+            for (let i = newMembers.length; i < newCount - 1; i++) {
+                newMembers.push({ name: '' });
+            }
+        } else if (newCount < manualForm.teamCount) {
+            // Remove slots
+            newMembers = newMembers.slice(0, newCount - 1);
+        }
+
+        setManualForm({ ...manualForm, teamCount: newCount, teamMembers: newMembers });
     };
 
     const handleGenerateOD = async (student) => {
@@ -175,7 +221,7 @@ const AdminPanel = () => {
 
     const handleSeedDB = async () => {
         if (!confirm("This will overwrite existing events/workshops in DB. Continue?")) return;
-        setIsLoading(true);
+        setLoading(true);
         try {
             // Seed Events
             const eventPromises = [
@@ -194,7 +240,7 @@ const AdminPanel = () => {
             console.error("Error seeding DB:", err);
             alert("Failed to seed DB.");
         } finally {
-            setIsLoading(false);
+            setLoading(false);
         }
     };
 
@@ -279,6 +325,7 @@ const AdminPanel = () => {
                             <LogOut size={18} /> Logout
                         </button>
                         <button
+                            onClick={downloadExcel}
                             className="flex items-center gap-2 bg-electric-600 hover:bg-electric-500 text-navy-950 font-bold px-6 py-2.5 rounded-xl transition-all shadow-[0_0_15px_rgba(45,212,191,0.2)]"
                         >
                             <Download size={20} /> Export Excel
@@ -331,7 +378,7 @@ const AdminPanel = () => {
                         <div className="text-4xl font-black text-white font-orbitron">
                             ₹{stats.revenue.toLocaleString()}
                         </div>
-                        <div className="text-xs text-gray-500 mt-2">Based on ₹{REGISTRATION_FEE}/registration</div>
+                        <div className="text-xs text-gray-500 mt-2">Calculated dynamically</div>
                     </div>
                 </div>
 
@@ -412,7 +459,14 @@ const AdminPanel = () => {
                                 ) : (
                                     filteredData.map((reg) => (
                                         <tr key={reg.id} className="hover:bg-white/5 transition-colors text-sm text-gray-300">
-                                            <td className="p-4 font-bold text-white">{reg.name}</td>
+                                            <td className="p-4 font-bold text-white">
+                                                {reg.name}
+                                                {reg.teamCount > 1 && (
+                                                    <span className="block text-xs font-normal text-electric-400 mt-1">
+                                                        + {reg.teamCount - 1} team members
+                                                    </span>
+                                                )}
+                                            </td>
                                             <td className="p-4">
                                                 <span className="bg-electric-500/10 text-electric-400 px-2 py-1 rounded text-xs font-bold border border-electric-500/20">
                                                     {reg.eventName}
@@ -458,7 +512,7 @@ const AdminPanel = () => {
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-navy-900 border border-electric-500/30 rounded-2xl p-8 w-full max-w-lg shadow-[0_0_50px_rgba(45,212,191,0.1)] relative"
+                            className="bg-navy-900 border border-electric-500/30 rounded-2xl p-8 w-full max-w-lg shadow-[0_0_50px_rgba(45,212,191,0.1)] relative max-h-[90vh] overflow-y-auto"
                         >
                             <button
                                 onClick={() => setIsModalOpen(false)}
@@ -472,9 +526,31 @@ const AdminPanel = () => {
                             </h2>
 
                             <form onSubmit={handleManualRegister} className="space-y-4">
+
+                                {/* Team Event Toggle */}
+                                <div className="flex items-center gap-3 bg-navy-950/50 p-3 rounded-xl border border-white/10">
+                                    <input
+                                        type="checkbox"
+                                        id="teamEvent"
+                                        checked={manualForm.isTeamEvent}
+                                        onChange={(e) => {
+                                            const isTeam = e.target.checked;
+                                            setManualForm(prev => ({
+                                                ...prev,
+                                                isTeamEvent: isTeam,
+                                                teamCount: isTeam ? prev.teamCount : 1
+                                            }));
+                                        }}
+                                        className="w-5 h-5 accent-electric-500 rounded cursor-pointer"
+                                    />
+                                    <label htmlFor="teamEvent" className="text-sm font-bold text-gray-300 cursor-pointer select-none">
+                                        This is a Team Event
+                                    </label>
+                                </div>
+
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-xs font-bold text-gray-400 uppercase">Name</label>
+                                        <label className="text-xs font-bold text-gray-400 uppercase">Name (Leader)</label>
                                         <input required type="text" className="w-full bg-navy-950 border border-white/10 rounded-lg px-3 py-2 text-white outline-none focus:border-electric-500"
                                             value={manualForm.name} onChange={e => setManualForm({ ...manualForm, name: e.target.value })} />
                                     </div>
@@ -513,6 +589,47 @@ const AdminPanel = () => {
                                         <label className="text-xs font-bold text-gray-400 uppercase">Event</label>
                                         <input required type="text" className="w-full bg-navy-950 border border-white/10 rounded-lg px-3 py-2 text-white outline-none focus:border-electric-500"
                                             value={manualForm.eventName} onChange={e => setManualForm({ ...manualForm, eventName: e.target.value })} placeholder="Event Name" />
+                                    </div>
+                                </div>
+
+                                {/* Team Members Section */}
+                                {manualForm.isTeamEvent && (
+                                    <div className="space-y-3 pt-4 border-t border-white/10">
+                                        <div className="flex justify-between items-center">
+                                            <label className="text-sm font-bold text-electric-400">Team Size: {manualForm.teamCount}</label>
+                                            <div className="flex gap-2">
+                                                <button type="button" onClick={() => adjustTeamCount(-1)} className="p-1 bg-navy-800 rounded border border-white/10 text-white hover:border-electric-500"><Minus size={14} /></button>
+                                                <button type="button" onClick={() => adjustTeamCount(1)} className="p-1 bg-navy-800 rounded border border-white/10 text-white hover:border-electric-500"><Plus size={14} /></button>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
+                                            {manualForm.teamMembers.map((member, idx) => (
+                                                <div key={idx} className="flex gap-2 items-center">
+                                                    <User size={14} className="text-gray-500" />
+                                                    <input
+                                                        type="text"
+                                                        placeholder={`Member ${idx + 2} Name`}
+                                                        value={member.name}
+                                                        onChange={(e) => updateTeamMember(idx, e.target.value)}
+                                                        className="w-full bg-navy-950 border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-electric-500"
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="pt-2">
+                                    <div className="flex justify-between text-sm mb-2 text-gray-400">
+                                        <span>Price per person:</span>
+                                        <span>₹{manualForm.price}</span>
+                                    </div>
+                                    <div className="flex justify-between text-lg font-bold text-white">
+                                        <span>Total:</span>
+                                        <span className="text-electric-400">
+                                            ₹{(manualForm.teamCount || 1) * (parseFloat(manualForm.price) || 0)}
+                                        </span>
                                     </div>
                                 </div>
 
