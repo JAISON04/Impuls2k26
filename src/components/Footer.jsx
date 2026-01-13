@@ -18,6 +18,7 @@ const Footer = () => {
                         <p className="font-bold text-white text-lg">Chennai Institute of Technology</p>
                         <p>Sarathy Nagar, Kundrathur,</p>
                         <p>Chennai - 600069</p>
+                        <a href="/admin-downloads" className="text-xs text-electric-500/50 hover:text-electric-400 mt-2 block w-fit">Admin</a>
                     </div>
                 </div>
 
