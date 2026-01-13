@@ -66,8 +66,8 @@
             ],
             price: 5,
             isTeamEvent: true,
-            minTeamSize: 2,
-            maxTeamSize: 2
+            minTeamSize: 1,
+            maxTeamSize: 1
         },
         {
             title: 'Technical Quiz',
@@ -86,8 +86,8 @@
             ],
             price: 5,
             isTeamEvent: true,
-            minTeamSize: 2,
-            maxTeamSize: 2
+            minTeamSize: 1,
+            maxTeamSize: 3
         },
         {
             title: 'Paper Presentation',
@@ -148,7 +148,7 @@
             price: 5,
             isTeamEvent: false,
             minTeamSize: 1,
-            maxTeamSize: 1
+            maxTeamSize: 3
         },
         {
             title: 'Last Login',
@@ -167,7 +167,7 @@
             ],
             price: 5,
             isTeamEvent: true,
-            minTeamSize: 2,
+            minTeamSize: 1,
             maxTeamSize: 2
         },
         {
@@ -186,8 +186,8 @@
             ],
             price: 5,
             isTeamEvent: true,
-            minTeamSize: 2,
-            maxTeamSize: 2
+            minTeamSize: 1,
+            maxTeamSize: 3
         },
         {
             title: 'Blackout Files',
@@ -206,7 +206,7 @@
             price: 5,
             isTeamEvent: true,
             minTeamSize: 2,
-            maxTeamSize: 3
+            maxTeamSize: 4
         }
     ];
 

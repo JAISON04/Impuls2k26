@@ -64,8 +64,8 @@ export const eventsData = {
             ],
             price: 5,
             isTeamEvent: true,
-            minTeamSize: 2,
-            maxTeamSize: 2
+            minTeamSize: 1,
+            maxTeamSize: 1
         },
         {
             id: 3,
@@ -85,8 +85,8 @@ export const eventsData = {
             ],
             price: 5,
             isTeamEvent: true,
-            minTeamSize: 2,
-            maxTeamSize: 2
+            minTeamSize: 1,
+            maxTeamSize: 3
         },
         {
             id: 4,
@@ -151,7 +151,7 @@ export const eventsData = {
             price: 5,
             isTeamEvent: false,
             minTeamSize: 1,
-            maxTeamSize: 1
+            maxTeamSize: 3
         },
         {
             id: 7,
@@ -170,7 +170,7 @@ export const eventsData = {
             ],
             price: 5,
             isTeamEvent: true,
-            minTeamSize: 2,
+            minTeamSize: 1,
             maxTeamSize: 2
         },
         {
@@ -189,8 +189,8 @@ export const eventsData = {
             ],
             price: 5,
             isTeamEvent: true,
-            minTeamSize: 2,
-            maxTeamSize: 2
+            minTeamSize: 1,
+            maxTeamSize: 3
         },
         {
             id: 9,
@@ -209,7 +209,7 @@ export const eventsData = {
             price: 5,
             isTeamEvent: true,
             minTeamSize: 2,
-            maxTeamSize: 3
+            maxTeamSize: 4
         }
     ],
     online: [
