@@ -228,7 +228,7 @@ export const eventsData = {
                 'No heavy editing allowed.',
                 'Submit before deadline.'
             ],
-            price: 5,
+            price: 30,
             isTeamEvent: false,
             minTeamSize: 1,
             maxTeamSize: 1
@@ -247,7 +247,7 @@ export const eventsData = {
                 'Submit in high resolution.',
                 'Judges decision is final.'
             ],
-            price: 5,
+            price: 30,
             isTeamEvent: false,
             minTeamSize: 1,
             maxTeamSize: 1
@@ -265,7 +265,7 @@ export const eventsData = {
                 'Max duration: 2 minutes.',
                 'Judges decision is final.'
             ],
-            price: 5,
+            price: 30,
             isTeamEvent: false,
             minTeamSize: 1,
             maxTeamSize: 1
