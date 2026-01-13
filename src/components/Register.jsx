@@ -58,7 +58,35 @@ const Register = () => {
         setError('');
         setIsPaymentLoading(true);
 
+        // Safe price conversion
+        let finalPrice = 0;
         try {
+            finalPrice = parseFloat(price);
+            if (isNaN(finalPrice)) finalPrice = 0;
+        } catch (e) {
+            console.warn("Error parsing price:", e);
+            finalPrice = 0;
+        }
+
+        console.log("Initiating payment for:", { eventName, finalPrice });
+
+        try {
+            // Case 1: Free Event - Skip Payment
+            if (finalPrice <= 0) {
+                console.log("Free event detected, skipping payment.");
+                await submitRegistration('FREE_REGISTRATION');
+                return;
+            }
+
+            // Case 2: Placeholder Key - Simulate Success (Dev Mode)
+            if (RAZORPAY_CONFIG.key_id === "YOUR_RAZORPAY_KEY") {
+                console.warn("Using placeholder Razorpay key. Simulating success...");
+                await new Promise(resolve => setTimeout(resolve, 1500)); // Fake delay
+                await submitRegistration('SIMULATED_PAYMENT_ID');
+                return;
+            }
+
+            // Case 3: Real Payment
             // 1. Load Razorpay SDK
             const isLoaded = await loadRazorpay();
             if (!isLoaded) {
@@ -67,23 +95,20 @@ const Register = () => {
                 return;
             }
 
-            // 2. Open Razorpay Checkout
-            // For testing we will just simulate success if key is placeholder
-            if (RAZORPAY_CONFIG.key_id === "YOUR_RAZORPAY_KEY") {
-                console.warn("Using placeholder Razorpay key. Simulating success...");
-                // Ensure price is at least 1 for testing if needed, though 0 is fine for free events
-            }
+            const amountInPaise = Math.round(finalPrice * 100);
+            console.log("Opening Razorpay with amount (paise):", amountInPaise);
 
+            // 2. Open Razorpay Checkout
             const options = {
                 key: RAZORPAY_CONFIG.key_id,
-                amount: price * 100, // Amount in paise
+                amount: amountInPaise,
                 currency: RAZORPAY_CONFIG.currency,
                 name: RAZORPAY_CONFIG.name,
                 description: `Registration for ${eventName}`,
-                image: "https://citimpulse.com/vite.svg", // Optional: Add your logo URL here
+                image: "https://citimpulse.com/vite.svg",
                 handler: async function (response) {
                     // Payment Success Handler
-                    console.log("Payment Success:", response);
+                    console.log("Payment Success Response:", response);
                     await submitRegistration(response.razorpay_payment_id);
                 },
                 prefill: {
@@ -92,21 +117,27 @@ const Register = () => {
                     contact: formData.phone,
                 },
                 theme: {
-                    color: "#2dd4bf", // Electric Teal
+                    color: "#2dd4bf",
                 },
+                modal: {
+                    ondismiss: function () {
+                        console.log("Payment modal dismissed by user.");
+                        setIsPaymentLoading(false);
+                    }
+                }
             };
 
             const paymentObject = new window.Razorpay(options);
             paymentObject.on('payment.failed', function (response) {
-                console.error("Payment Failed:", response.error);
-                setError(`Payment Failed: ${response.error.description}`);
+                console.error("Payment Failed Error:", response.error);
+                setError(`Payment Failed: ${response.error.description} (Code: ${response.error.code})`);
                 setIsPaymentLoading(false);
             });
 
             paymentObject.open();
         } catch (err) {
             console.error("Payment initialization error:", err);
-            setError("Failed to initialize payment.");
+            setError(`Failed to initialize payment: ${err.message}`);
             setIsPaymentLoading(false);
         }
     };
