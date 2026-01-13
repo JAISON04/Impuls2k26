@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Building, GraduationCap, Phone, Mail, CheckCircle, Loader2, CreditCard } from 'lucide-react';
+import { ArrowLeft, User, Building, GraduationCap, Phone, Mail, CheckCircle, Loader2, CreditCard, Users, Plus, Minus } from 'lucide-react';
 import { collection, addDoc, doc, setDoc, updateDoc, arrayUnion, serverTimestamp } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { db, functions } from '../firebase';
@@ -14,7 +14,16 @@ const Register = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { currentUser } = useAuth();
-    const { eventName, category, price } = location.state || { eventName: '', category: 'Event', price: 0 };
+
+    // Extract event data from navigation state
+    const {
+        eventName,
+        category,
+        price = 0,
+        isTeamEvent = false,
+        minTeamSize = 1,
+        maxTeamSize = 1
+    } = location.state || { eventName: '', category: 'Event', price: 0 };
 
     const [formData, setFormData] = useState({
         name: '',
@@ -24,10 +33,26 @@ const Register = () => {
         email: '',
     });
 
+    // Team state - initialize to minTeamSize for team events
+    const [teamCount, setTeamCount] = useState(isTeamEvent ? minTeamSize : 1);
+    const [teamMembers, setTeamMembers] = useState([]);
+
+    // Update teamCount if minTeamSize changes (e.g., navigating to different event)
+    useEffect(() => {
+        if (isTeamEvent) {
+            setTeamCount(minTeamSize);
+        }
+    }, [isTeamEvent, minTeamSize]);
+
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isPaymentLoading, setIsPaymentLoading] = useState(false);
     const [error, setError] = useState('');
+
+    // Calculate total price based on team size
+    const totalPrice = useMemo(() => {
+        return teamCount * (parseFloat(price) || 0);
+    }, [teamCount, price]);
 
     useEffect(() => {
         // Redirect if not logged in
@@ -36,10 +61,10 @@ const Register = () => {
             return;
         }
 
-        // Auto-fill from Auth
+        // Auto-fill email from Auth (name is editable)
         setFormData(prev => ({
             ...prev,
-            name: currentUser.displayName || '',
+            name: prev.name || currentUser.displayName || '',
             email: currentUser.email || ''
         }));
 
@@ -49,8 +74,41 @@ const Register = () => {
         }
     }, [location, navigate, currentUser]);
 
+    // Initialize team members when teamCount changes
+    useEffect(() => {
+        if (isTeamEvent && teamCount > 1) {
+            // Create empty team member slots (excluding the main registrant)
+            const additionalMembers = teamCount - 1;
+            setTeamMembers(prev => {
+                const newMembers = [];
+                for (let i = 0; i < additionalMembers; i++) {
+                    newMembers.push(prev[i] || { name: '' });
+                }
+                return newMembers;
+            });
+        } else {
+            setTeamMembers([]);
+        }
+    }, [teamCount, isTeamEvent]);
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    // Team member handlers
+    const handleTeamCountChange = (delta) => {
+        setTeamCount(prev => {
+            const newCount = prev + delta;
+            return Math.max(minTeamSize, Math.min(maxTeamSize, newCount));
+        });
+    };
+
+    const handleTeamMemberChange = (index, value) => {
+        setTeamMembers(prev => {
+            const updated = [...prev];
+            updated[index] = { name: value };
+            return updated;
+        });
     };
 
     const handlePaymentAndSubmit = async (e) => {
@@ -58,17 +116,20 @@ const Register = () => {
         setError('');
         setIsPaymentLoading(true);
 
-        // Safe price conversion
-        let finalPrice = 0;
-        try {
-            finalPrice = parseFloat(price);
-            if (isNaN(finalPrice)) finalPrice = 0;
-        } catch (e) {
-            console.warn("Error parsing price:", e);
-            finalPrice = 0;
+        // Validate team member names if team event
+        if (isTeamEvent && teamCount > 1) {
+            const emptyMembers = teamMembers.filter(m => !m.name?.trim());
+            if (emptyMembers.length > 0) {
+                setError('Please enter names for all team members.');
+                setIsPaymentLoading(false);
+                return;
+            }
         }
 
-        console.log("Initiating payment for:", { eventName, finalPrice });
+        // Use calculated total price
+        const finalPrice = totalPrice;
+
+        console.log("Initiating payment for:", { eventName, finalPrice, teamCount });
 
         try {
             // Case 1: Free Event - Skip Payment
@@ -154,7 +215,10 @@ const Register = () => {
                 ...formData,
                 eventName,
                 category,
-                price: price || 0,
+                pricePerPerson: price || 0,
+                teamCount: teamCount,
+                teamMembers: teamMembers,
+                totalPrice: totalPrice,
                 paymentId: paymentId || 'N/A',
                 uid: currentUser.uid,
                 registeredAt: serverTimestamp()
@@ -170,7 +234,9 @@ const Register = () => {
                 name: formData.name,
                 eventName: eventName,
                 paymentId: paymentId || 'N/A',
-                amount: price || 0,
+                amount: totalPrice,
+                teamCount: teamCount,
+                teamMembers: teamMembers.map(m => m.name),
                 refId: newRegId
             });
 
@@ -181,6 +247,8 @@ const Register = () => {
                     eventId: newRegId,
                     eventName: eventName,
                     category: category,
+                    teamCount: teamCount,
+                    teamMembers: teamMembers.map(m => m.name),
                     registeredAt: new Date().toISOString(),
                     paymentId: paymentId || 'N/A'
                 })
@@ -237,17 +305,27 @@ const Register = () => {
                                         You are registering for <span className="text-electric-400 font-bold">{eventName || 'an Event'}</span>
                                     </p>
                                     {(price !== undefined && price > 0) && (
-                                        <div className="mt-4 bg-electric-500/10 border border-electric-500/20 rounded-lg p-3 inline-flex items-center gap-2 text-electric-300 font-bold">
+                                        <div className="mt-4 bg-electric-500/10 border border-electric-500/20 rounded-lg p-3 inline-flex items-center gap-3 text-electric-300 font-bold">
                                             <CreditCard size={18} />
-                                            <span>Registration Fee: ₹{price}</span>
+                                            {isTeamEvent && teamCount > 1 ? (
+                                                <span>{teamCount} × ₹{price} = ₹{totalPrice}</span>
+                                            ) : (
+                                                <span>Registration Fee: ₹{price}</span>
+                                            )}
                                         </div>
+                                    )}
+                                    {isTeamEvent && (
+                                        <p className="mt-2 text-sm text-gray-500">
+                                            <Users size={14} className="inline mr-1" />
+                                            Team event: {minTeamSize === maxTeamSize ? `${minTeamSize} members` : `${minTeamSize}-${maxTeamSize} members`}
+                                        </p>
                                     )}
                                 </div>
 
                                 <form onSubmit={handlePaymentAndSubmit} className="space-y-6">
-                                    {/* Name */}
+                                    {/* Name - Editable */}
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-gray-300 ml-1">Full Name</label>
+                                        <label className="text-sm font-bold text-gray-300 ml-1">Your Full Name</label>
                                         <div className="relative">
                                             <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
                                             <input
@@ -255,11 +333,61 @@ const Register = () => {
                                                 name="name"
                                                 required
                                                 value={formData.name}
-                                                readOnly
-                                                className="w-full bg-navy-950/50 border border-white/5 rounded-xl py-3 pl-12 pr-4 text-gray-400 cursor-not-allowed outline-none"
+                                                onChange={handleChange}
+                                                placeholder="Enter your full name"
+                                                className="w-full bg-navy-950 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:border-electric-500 focus:ring-1 focus:ring-electric-500 outline-none transition-all placeholder:text-gray-700"
                                             />
                                         </div>
                                     </div>
+
+                                    {/* Team Size Selector - For all team events */}
+                                    {isTeamEvent && minTeamSize > 1 && (
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-bold text-gray-300 ml-1">Number of Participants</label>
+                                            <div className="flex items-center gap-4">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleTeamCountChange(-1)}
+                                                    disabled={teamCount <= minTeamSize}
+                                                    className="w-10 h-10 rounded-lg bg-navy-950 border border-white/10 flex items-center justify-center text-white hover:border-electric-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                                >
+                                                    <Minus size={18} />
+                                                </button>
+                                                <span className="text-2xl font-bold text-electric-400 w-8 text-center">{teamCount}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleTeamCountChange(1)}
+                                                    disabled={teamCount >= maxTeamSize}
+                                                    className="w-10 h-10 rounded-lg bg-navy-950 border border-white/10 flex items-center justify-center text-white hover:border-electric-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                                >
+                                                    <Plus size={18} />
+                                                </button>
+                                                <span className="text-sm text-gray-500">Team Members (including you)</span>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Team Member Name Fields */}
+                                    {isTeamEvent && teamMembers.length > 0 && (
+                                        <div className="space-y-3 border border-electric-500/20 rounded-xl p-4 bg-navy-950/50">
+                                            <label className="text-sm font-bold text-electric-400 flex items-center gap-2">
+                                                <Users size={16} /> Team Member Names
+                                            </label>
+                                            {teamMembers.map((member, index) => (
+                                                <div key={index} className="relative">
+                                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                                                    <input
+                                                        type="text"
+                                                        required
+                                                        value={member.name}
+                                                        onChange={(e) => handleTeamMemberChange(index, e.target.value)}
+                                                        placeholder={`Team Member ${index + 2} Name`}
+                                                        className="w-full bg-navy-950 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:border-electric-500 focus:ring-1 focus:ring-electric-500 outline-none transition-all placeholder:text-gray-700"
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
 
                                     {/* College */}
                                     <div className="space-y-2">
@@ -348,8 +476,8 @@ const Register = () => {
                                             </>
                                         ) : (
                                             <>
-                                                {price > 0 ? (
-                                                    <span>Pay ₹{price} & Register</span>
+                                                {totalPrice > 0 ? (
+                                                    <span>Pay ₹{totalPrice} & Register</span>
                                                 ) : (
                                                     <span>Complete Registration</span>
                                                 )}

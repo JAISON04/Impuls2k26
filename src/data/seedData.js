@@ -41,7 +41,10 @@ export const eventsData = {
                 'Time limit: 45 minutes.',
                 'Judges decision is final.'
             ],
-            price: 5
+            price: 5,
+            isTeamEvent: true,
+            minTeamSize: 1,
+            maxTeamSize: 2
         },
         {
             id: 2,
@@ -58,7 +61,11 @@ export const eventsData = {
                 'Safety gear (gloves) must be worn.',
                 'Circuit diagram will be provided.',
                 'Judges decision is final.'
-            ]
+            ],
+            price: 5,
+            isTeamEvent: true,
+            minTeamSize: 2,
+            maxTeamSize: 2
         },
         {
             id: 3,
@@ -75,7 +82,11 @@ export const eventsData = {
                 'No electronic gadgets allowed.',
                 'Quiz specific rules will be announced on spot.',
                 'Judges decision is final.'
-            ]
+            ],
+            price: 5,
+            isTeamEvent: true,
+            minTeamSize: 2,
+            maxTeamSize: 2
         },
         {
             id: 4,
@@ -93,7 +104,11 @@ export const eventsData = {
                 'Abstract must be submitted before the deadline.',
                 'Presentation time: 7 mins + 3 mins Q&A.',
                 'Judges decision is final.'
-            ]
+            ],
+            price: 5,
+            isTeamEvent: true,
+            minTeamSize: 1,
+            maxTeamSize: 3
         },
         {
             id: 5,
@@ -111,7 +126,11 @@ export const eventsData = {
                 'Working prototype is mandatory.',
                 'Presentation time: 7 mins + 3 mins Q&A.',
                 'Judges decision is final.'
-            ]
+            ],
+            price: 5,
+            isTeamEvent: true,
+            minTeamSize: 1,
+            maxTeamSize: 3
         },
         {
             id: 6,
@@ -128,7 +147,11 @@ export const eventsData = {
                 'Software provided: AutoCAD/Eagle.',
                 'Time limit: 1 hour.',
                 'Judges decision is final.'
-            ]
+            ],
+            price: 5,
+            isTeamEvent: false,
+            minTeamSize: 1,
+            maxTeamSize: 1
         },
         {
             id: 7,
@@ -144,7 +167,11 @@ export const eventsData = {
                 'Team of 2 members.',
                 'Laptop required.',
                 'Judges decision is final.'
-            ]
+            ],
+            price: 5,
+            isTeamEvent: true,
+            minTeamSize: 2,
+            maxTeamSize: 2
         },
         {
             id: 8,
@@ -159,7 +186,11 @@ export const eventsData = {
                 'Team of 2 members.',
                 'Components provided.',
                 'Judges decision is final.'
-            ]
+            ],
+            price: 5,
+            isTeamEvent: true,
+            minTeamSize: 2,
+            maxTeamSize: 2
         },
         {
             id: 9,
@@ -174,7 +205,11 @@ export const eventsData = {
                 'Team of 2-3 members.',
                 'Critical thinking required.',
                 'Judges decision is final.'
-            ]
+            ],
+            price: 5,
+            isTeamEvent: true,
+            minTeamSize: 2,
+            maxTeamSize: 3
         }
     ],
     online: [
@@ -192,7 +227,10 @@ export const eventsData = {
                 'No heavy editing allowed.',
                 'Submit before deadline.'
             ],
-            price: 5
+            price: 5,
+            isTeamEvent: false,
+            minTeamSize: 1,
+            maxTeamSize: 1
         },
         {
             id: 102,
@@ -208,7 +246,10 @@ export const eventsData = {
                 'Submit in high resolution.',
                 'Judges decision is final.'
             ],
-            price: 5
+            price: 5,
+            isTeamEvent: false,
+            minTeamSize: 1,
+            maxTeamSize: 1
         },
         {
             id: 103,
@@ -223,7 +264,10 @@ export const eventsData = {
                 'Max duration: 2 minutes.',
                 'Judges decision is final.'
             ],
-            price: 5
+            price: 5,
+            isTeamEvent: false,
+            minTeamSize: 1,
+            maxTeamSize: 1
         }
     ]
 };
