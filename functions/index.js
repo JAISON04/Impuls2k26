@@ -53,3 +53,74 @@ exports.sendRegistrationEmail = onCall({ cors: true }, async (request) => {
         throw new HttpsError('internal', 'Unable to send email', error);
     }
 });
+
+exports.sendODEmail = onCall({ cors: true }, async (request) => {
+    const data = request.data;
+    const { email, name, college, eventDate } = data;
+
+    if (!email) {
+        throw new HttpsError('invalid-argument', 'The function must be called with an "email" argument.');
+    }
+
+    const sendSmtpEmail = new Brevo.SendSmtpEmail();
+    sendSmtpEmail.subject = `On-Duty Letter: Impulse 2026 - ${name}`;
+    sendSmtpEmail.htmlContent = `
+    <html>
+    <head>
+        <style>
+            body { font-family: 'Times New Roman', Times, serif; line-height: 1.6; color: #000; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .title { font-weight: bold; font-size: 24px; margin-bottom: 5px; }
+            .subtitle { font-size: 16px; margin-bottom: 20px; }
+            .content { margin-bottom: 30px; }
+            .signature { margin-top: 50px; }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <div class="title">CHENNAI INSTITUTE OF TECHNOLOGY</div>
+            <div class="subtitle">Sarathy Nagar, Kundrathur, Chennai - 600069</div>
+            <hr/>
+        </div>
+
+        <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+        <p><strong>To:</strong></p>
+        <p>The Principal / HOD,<br/>
+        ${college}</p>
+
+        <p><strong>Sub: On-Duty Request for Student Participation in IMPULSE 2026</strong></p>
+
+        <p>Respected Sir/Madam,</p>
+
+        <div class="content">
+            <p>This is to certify that <strong>${name}</strong> is a registered participant for <strong>IMPULSE 2026</strong>, a National Level Technical Symposium organized by the Department of Electrical and Electronics Engineering, Chennai Institute of Technology.</p>
+            
+            <p>The event is scheduled to be held on <strong>${eventDate || 'March 20, 2026'}</strong>.</p>
+            
+            <p>We kindly request you to grant On-Duty (OD) to this student to enable their participation in the event.</p>
+        </div>
+
+        <p>Thank you,</p>
+
+        <div class="signature">
+            <p>Yours Sincerely,</p>
+            <br/><br/>
+            <p><strong>Convenor - IMPULSE 2026</strong><br/>
+            Department of EEE<br/>
+            Chennai Institute of Technology</p>
+        </div>
+    </body>
+    </html>`;
+
+    sendSmtpEmail.sender = { "name": "Impulse Team", "email": "noreply@citimpulse.com" };
+    sendSmtpEmail.to = [{ "email": email, "name": name }];
+
+    try {
+        const result = await brevoClient.sendTransacEmail(sendSmtpEmail);
+        logger.info("OD Email sent successfully", { result });
+        return { success: true, messageId: result.messageId };
+    } catch (error) {
+        logger.error("Error sending OD email", error);
+        throw new HttpsError('internal', 'Unable to send OD email', error);
+    }
+});

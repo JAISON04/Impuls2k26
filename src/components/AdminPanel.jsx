@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
-import { db } from '../firebase';
+import { collection, getDocs, orderBy, query, addDoc, serverTimestamp } from 'firebase/firestore';
+import { httpsCallable } from 'firebase/functions';
+import { db, functions } from '../firebase';
 import * as XLSX from 'xlsx';
 import { Download, Table, Loader2, AlertCircle, Users, IndianRupee, FileText, Search, LogOut, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -20,11 +21,22 @@ const AdminPanel = () => {
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    // Manual Registration State
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [manualForm, setManualForm] = useState({
+        name: '', college: '', year: '', phone: '', email: '', eventName: '', price: 150
+    });
+
+    // OD State
+    const [sendingOD, setSendingOD] = useState(null);
+
     // Stats
     const [stats, setStats] = useState({
         total: 0,
         unique: 0,
-        revenue: 0
+        revenue: 0,
+        eventBreakdown: {}
     });
 
     const REGISTRATION_FEE = 150; // Placeholder fee
@@ -64,10 +76,19 @@ const AdminPanel = () => {
 
     const calculateStats = (data) => {
         const participants = new Set(data.map(item => item.phone)).size;
+
+        // Calculate event breakdown
+        const breakdown = {};
+        data.forEach(item => {
+            const event = item.eventName || 'Unknown';
+            breakdown[event] = (breakdown[event] || 0) + 1;
+        });
+
         setStats({
             total: data.length,
             unique: participants,
-            revenue: data.length * REGISTRATION_FEE
+            revenue: data.length * REGISTRATION_FEE,
+            eventBreakdown: breakdown
         });
     };
 
@@ -92,6 +113,55 @@ const AdminPanel = () => {
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Registrations");
         XLSX.writeFile(workbook, "Impulse_Registrations.xlsx");
+    };
+
+    const handleManualRegister = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        try {
+            // 1. Add to Firestore
+            const docRef = await addDoc(collection(db, "registrations"), {
+                ...manualForm,
+                category: 'Manual',
+                paymentId: 'MANUAL',
+                uid: 'ADMIN_ENTRY',
+                registeredAt: serverTimestamp()
+            });
+
+            // 2. Refresh Data
+            fetchRegistrations();
+
+            // 3. Reset & Close
+            setIsModalOpen(false);
+            setManualForm({ name: '', college: '', year: '', phone: '', email: '', eventName: '', price: 150 });
+            alert("Student registered successfully!");
+        } catch (err) {
+            console.error(err);
+            alert("Failed to register student.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleSendOD = async (student) => {
+        if (!confirm(`Send OD Letter to ${student.name}?`)) return;
+
+        setSendingOD(student.id);
+        try {
+            const sendOD = httpsCallable(functions, 'sendODEmail');
+            await sendOD({
+                email: student.email,
+                name: student.name,
+                college: student.college,
+                eventDate: 'March 20, 2026'
+            });
+            alert(`OD Letter sent to ${student.name}`);
+        } catch (err) {
+            console.error(err);
+            alert("Failed to send OD email. Check console.");
+        } finally {
+            setSendingOD(null);
+        }
     };
 
     // --- Login View ---
@@ -168,10 +238,15 @@ const AdminPanel = () => {
                             <LogOut size={18} /> Logout
                         </button>
                         <button
-                            onClick={downloadExcel}
                             className="flex items-center gap-2 bg-electric-600 hover:bg-electric-500 text-navy-950 font-bold px-6 py-2.5 rounded-xl transition-all shadow-[0_0_15px_rgba(45,212,191,0.2)]"
                         >
                             <Download size={20} /> Export Excel
+                        </button>
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="flex items-center gap-2 bg-pink-600 hover:bg-pink-500 text-white font-bold px-6 py-2.5 rounded-xl transition-all shadow-[0_0_15px_rgba(236,72,153,0.2)]"
+                        >
+                            <Users size={20} /> Register Student
                         </button>
                     </div>
                 </div>
@@ -219,6 +294,23 @@ const AdminPanel = () => {
                     </div>
                 </div>
 
+                {/* Event Breakdown Section */}
+                <div className="mb-8">
+                    <h2 className="text-xl font-orbitron font-bold text-white mb-4 flex items-center gap-2">
+                        <FileText size={20} className="text-purple-400" /> Event Breakdown
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {Object.entries(stats.eventBreakdown).sort((a, b) => b[1] - a[1]).map(([event, count]) => (
+                            <div key={event} className="bg-navy-900/50 border border-white/10 rounded-xl p-4 flex justify-between items-center backdrop-blur-sm hover:border-purple-500/50 transition-colors">
+                                <span className="text-gray-300 text-sm font-medium truncate pr-2" title={event}>{event}</span>
+                                <span className="bg-purple-500/10 text-purple-400 px-2 py-1 rounded text-xs font-bold border border-purple-500/20">
+                                    {count}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
                 {/* Error Banner */}
                 {error && (
                     <div className="bg-red-500/10 border border-red-500 text-red-400 p-4 rounded-xl mb-6 flex items-center gap-2">
@@ -257,12 +349,13 @@ const AdminPanel = () => {
                                     <th className="p-4 font-bold">Contact</th>
                                     <th className="p-4 font-bold">Year</th>
                                     <th className="p-4 font-bold">Date</th>
+                                    <th className="p-4 font-bold">Action</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
                                 {loading ? (
                                     <tr>
-                                        <td colSpan="6" className="p-12 text-center text-electric-400">
+                                        <td colSpan="7" className="p-12 text-center text-electric-400">
                                             <div className="flex flex-col items-center justify-center gap-2">
                                                 <Loader2 className="animate-spin" size={32} />
                                                 <span className="text-sm">Loading data...</span>
@@ -271,7 +364,7 @@ const AdminPanel = () => {
                                     </tr>
                                 ) : filteredData.length === 0 ? (
                                     <tr>
-                                        <td colSpan="6" className="p-8 text-center text-gray-500 italic">
+                                        <td colSpan="7" className="p-8 text-center text-gray-500 italic">
                                             {searchTerm ? 'No matching records found.' : 'No registrations found yet.'}
                                         </td>
                                     </tr>
@@ -291,6 +384,16 @@ const AdminPanel = () => {
                                             </td>
                                             <td className="p-4">{reg.year}</td>
                                             <td className="p-4 text-gray-500 text-xs whitespace-nowrap">{reg.registeredAt}</td>
+                                            <td className="p-4">
+                                                <button
+                                                    onClick={() => handleSendOD(reg)}
+                                                    disabled={sendingOD === reg.id}
+                                                    className="bg-navy-800 hover:bg-navy-700 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-white/10 flex items-center gap-2"
+                                                >
+                                                    {sendingOD === reg.id ? <Loader2 className="animate-spin" size={14} /> : <FileText size={14} />}
+                                                    Send OD
+                                                </button>
+                                            </td>
                                         </tr>
                                     ))
                                 )}
@@ -299,7 +402,86 @@ const AdminPanel = () => {
                     </div>
                 </div>
             </div>
-        </Section>
+
+            {/* Manual Registration Modal */}
+            <AnimatePresence>
+                {isModalOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy-950/80 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="bg-navy-900 border border-electric-500/30 rounded-2xl p-8 w-full max-w-lg shadow-[0_0_50px_rgba(45,212,191,0.1)] relative"
+                        >
+                            <button
+                                onClick={() => setIsModalOpen(false)}
+                                className="absolute top-4 right-4 text-gray-400 hover:text-white"
+                            >
+                                <LogOut size={20} className="rotate-180" />
+                            </button>
+
+                            <h2 className="text-2xl font-orbitron font-bold text-white mb-6 flex items-center gap-2">
+                                <Users size={24} className="text-electric-400" /> Manual Register
+                            </h2>
+
+                            <form onSubmit={handleManualRegister} className="space-y-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-400 uppercase">Name</label>
+                                        <input required type="text" className="w-full bg-navy-950 border border-white/10 rounded-lg px-3 py-2 text-white outline-none focus:border-electric-500"
+                                            value={manualForm.name} onChange={e => setManualForm({ ...manualForm, name: e.target.value })} />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-400 uppercase">Phone</label>
+                                        <input required type="text" className="w-full bg-navy-950 border border-white/10 rounded-lg px-3 py-2 text-white outline-none focus:border-electric-500"
+                                            value={manualForm.phone} onChange={e => setManualForm({ ...manualForm, phone: e.target.value })} />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="text-xs font-bold text-gray-400 uppercase">Email</label>
+                                    <input required type="email" className="w-full bg-navy-950 border border-white/10 rounded-lg px-3 py-2 text-white outline-none focus:border-electric-500"
+                                        value={manualForm.email} onChange={e => setManualForm({ ...manualForm, email: e.target.value })} />
+                                </div>
+
+                                <div>
+                                    <label className="text-xs font-bold text-gray-400 uppercase">College</label>
+                                    <input required type="text" className="w-full bg-navy-950 border border-white/10 rounded-lg px-3 py-2 text-white outline-none focus:border-electric-500"
+                                        value={manualForm.college} onChange={e => setManualForm({ ...manualForm, college: e.target.value })} />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-400 uppercase">Year</label>
+                                        <select className="w-full bg-navy-950 border border-white/10 rounded-lg px-3 py-2 text-white outline-none focus:border-electric-500"
+                                            value={manualForm.year} onChange={e => setManualForm({ ...manualForm, year: e.target.value })}>
+                                            <option value="">Select</option>
+                                            <option value="1">1st Year</option>
+                                            <option value="2">2nd Year</option>
+                                            <option value="3">3rd Year</option>
+                                            <option value="4">4th Year</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-400 uppercase">Event</label>
+                                        <input required type="text" className="w-full bg-navy-950 border border-white/10 rounded-lg px-3 py-2 text-white outline-none focus:border-electric-500"
+                                            value={manualForm.eventName} onChange={e => setManualForm({ ...manualForm, eventName: e.target.value })} placeholder="Event Name" />
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="w-full py-3 bg-electric-600 hover:bg-electric-500 text-navy-950 font-bold rounded-xl transition-all hover:shadow-[0_0_20px_#2dd4bf] mt-4 flex justify-center items-center gap-2"
+                                >
+                                    {isSubmitting ? <Loader2 className="animate-spin" /> : "Submit Registration"}
+                                </button>
+                            </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+        </Section >
     );
 };
 
