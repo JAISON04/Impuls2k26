@@ -128,22 +128,20 @@ const Register = () => {
 
             console.log("Document written with ID: ", docRef.id);
 
-            // 2. Send Email via Cloud Function
-            try {
-                const sendEmailFn = httpsCallable(functions, 'sendRegistrationEmail');
-                await sendEmailFn({
-                    email: formData.email,
-                    name: formData.name,
-                    eventName: eventName,
-                    paymentId: paymentId || 'N/A',
-                    amount: price || 0,
-                    refId: docRef.id
-                });
+            // 2. Send Email via Cloud Function (Non-blocking)
+            const sendEmailFn = httpsCallable(functions, 'sendRegistrationEmail');
+            sendEmailFn({
+                email: formData.email,
+                name: formData.name,
+                eventName: eventName,
+                paymentId: paymentId || 'N/A',
+                amount: price || 0,
+                refId: docRef.id
+            }).then(() => {
                 console.log("Email request sent to Cloud Function");
-            } catch (emailErr) {
+            }).catch((emailErr) => {
                 console.error('Failed to send email:', emailErr);
-                // We don't block success UI if email fails, but we assume the user checks console
-            }
+            });
 
             setIsSubmitted(true);
         } catch (err) {

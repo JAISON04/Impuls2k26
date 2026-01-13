@@ -25,7 +25,7 @@ const AdminPanel = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [manualForm, setManualForm] = useState({
-        name: '', college: '', year: '', phone: '', email: '', eventName: '', price: 150
+        name: '', college: '', year: '', phone: '', email: '', eventName: '', price: 5
     });
 
     // OD State
@@ -39,7 +39,7 @@ const AdminPanel = () => {
         eventBreakdown: {}
     });
 
-    const REGISTRATION_FEE = 150; // Placeholder fee
+    const REGISTRATION_FEE = 5; // Placeholder fee
 
     const handleLogin = (e) => {
         e.preventDefault();
@@ -133,7 +133,7 @@ const AdminPanel = () => {
 
             // 3. Reset & Close
             setIsModalOpen(false);
-            setManualForm({ name: '', college: '', year: '', phone: '', email: '', eventName: '', price: 150 });
+            setManualForm({ name: '', college: '', year: '', phone: '', email: '', eventName: '', price: 5 });
             alert("Student registered successfully!");
         } catch (err) {
             console.error(err);
@@ -158,7 +158,7 @@ const AdminPanel = () => {
             alert(`OD Letter sent to ${student.name}`);
         } catch (err) {
             console.error(err);
-            alert("Failed to send OD email. Check console.");
+            alert(`Failed to send OD email: ${err.message}`);
         } finally {
             setSendingOD(null);
         }

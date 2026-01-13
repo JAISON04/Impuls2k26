@@ -37,7 +37,7 @@ export const eventsData = {
                 'Time limit: 45 minutes.',
                 'Judges decision is final.'
             ],
-            price: 150
+            price: 5
         },
         {
             id: 2,
@@ -240,7 +240,7 @@ export const EventDetailsModal = ({ event, onClose }) => {
             state: {
                 eventName: event.title,
                 category: 'Event',
-                price: event.price || 150, // Default price if not specified
+                price: event.price || 5, // Default price if not specified
                 rules: event.rules
             }
         });

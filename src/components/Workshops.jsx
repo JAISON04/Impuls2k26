@@ -144,6 +144,7 @@ const WorkshopDetailsModal = ({ workshop, onClose }) => {
             state: {
                 eventName: workshop.title,
                 category: 'Workshop',
+                price: 5,
                 rules: workshop.rules // Pass rules
             }
         });
