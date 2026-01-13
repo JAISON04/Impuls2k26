@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Building, GraduationCap, Phone, Mail, CheckCircle, Loader2, CreditCard } from 'lucide-react';
-import { collection, addDoc, doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, doc, setDoc, updateDoc, arrayUnion, serverTimestamp } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { db, functions } from '../firebase';
 import { EMAIL_CONFIG } from '../emailConfig';
@@ -143,8 +143,20 @@ const Register = () => {
                 refId: newRegId
             });
 
+            // 2c. Link Event to User Profile
+            const userRef = doc(db, 'users', currentUser.uid);
+            const userUpdatePromise = updateDoc(userRef, {
+                registeredEvents: arrayUnion({
+                    eventId: newRegId,
+                    eventName: eventName,
+                    category: category,
+                    registeredAt: new Date().toISOString(),
+                    paymentId: paymentId || 'N/A'
+                })
+            }).catch(err => console.warn("Failed to link event to user profile:", err));
+
             // 3. Log errors in background but don't block UI
-            Promise.all([dbPromise, emailPromise]).then(() => {
+            Promise.all([dbPromise, emailPromise, userUpdatePromise]).then(() => {
                 console.log("Background registration tasks completed.");
             }).catch(err => {
                 console.error("Background task failed:", err);

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, orderBy, query, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, addDoc, serverTimestamp, setDoc, doc } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { db, functions } from '../firebase';
+import { eventsData } from './Events';
+import { workshopsData } from './Workshops';
 import * as XLSX from 'xlsx';
-import { Download, Table, Loader2, AlertCircle, Users, IndianRupee, FileText, Search, LogOut, CheckCircle } from 'lucide-react';
+import { Download, Table, Loader2, AlertCircle, Users, IndianRupee, FileText, Search, LogOut, CheckCircle, Database } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Section from './Section';
 
@@ -164,6 +166,31 @@ const AdminPanel = () => {
         }
     };
 
+    const handleSeedDB = async () => {
+        if (!confirm("This will overwrite existing events/workshops in DB. Continue?")) return;
+        setIsLoading(true);
+        try {
+            // Seed Events
+            const eventPromises = [
+                ...eventsData.technical.map(e => setDoc(doc(db, 'events', `tech_${e.id}`), { ...e, category: 'Technical' })),
+                ...eventsData.online.map(e => setDoc(doc(db, 'events', `online_${e.id}`), { ...e, category: 'Online' }))
+            ];
+
+            // Seed Workshops
+            const workshopPromises = workshopsData.map(w =>
+                setDoc(doc(db, 'workshops', `workshop_${w.id}`), { ...w, category: 'Workshop' })
+            );
+
+            await Promise.all([...eventPromises, ...workshopPromises]);
+            alert("Database seeded successfully!");
+        } catch (err) {
+            console.error("Error seeding DB:", err);
+            alert("Failed to seed DB.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     // --- Login View ---
     if (!isLoggedIn) {
         return (
@@ -231,6 +258,13 @@ const AdminPanel = () => {
                         <p className="text-gray-400 text-sm mt-1">Real-time registration tracking</p>
                     </div>
                     <div className="flex gap-4">
+                        <button
+                            onClick={handleSeedDB}
+                            className="flex items-center gap-2 bg-red-500/10 text-red-500 px-4 py-2 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-colors"
+                            title="Seed Database (Dev Only)"
+                        >
+                            <Database size={18} /> Seed DB
+                        </button>
                         <button
                             onClick={() => setIsLoggedIn(false)}
                             className="flex items-center gap-2 bg-navy-800 hover:bg-navy-700 text-gray-300 px-5 py-2.5 rounded-xl border border-white/10 transition-all font-medium"

@@ -14,7 +14,7 @@ import astronomy from '../assets/images/imageentre.png'; // Reusing for Astronom
 import videoEdit from '../assets/images/imagevideo.png';
 import startup from '../assets/images/imagestartuppitch.png'; // Alternative for MicroSaaS
 
-const workshopsData = [
+export const workshopsData = [
     {
         id: 1,
         title: 'Kuka Robotics',
