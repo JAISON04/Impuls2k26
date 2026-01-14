@@ -89,8 +89,9 @@ exports.sendRegistrationEmail = onCall({ cors: true }, async (request) => {
 });
 
 exports.sendODEmail = onCall({ cors: true }, async (request) => {
+    // request.data can be the data directly.
     const data = request.data;
-    const { email, name, college, eventDate } = data;
+    const { email, name, college, eventDate, eventName } = data; // Added eventName
 
     if (!email) {
         throw new HttpsError('invalid-argument', 'The function must be called with an "email" argument.');
@@ -167,10 +168,11 @@ exports.sendODEmail = onCall({ cors: true }, async (request) => {
             return { success: true, messageId: result.messageId };
         } else {
             logger.error("Failed to send OD email", result.error);
-            throw new HttpsError('internal', result.error || 'Unable to send OD email');
+            throw new HttpsError('internal', `OD Service Error: ${result.error || 'Unknown Service Error'}`);
         }
     } catch (error) {
         logger.error("Error sending OD email", error);
-        throw new HttpsError('internal', 'Unable to send OD email', error);
+        // Expose the actual error details to the client for debugging
+        throw new HttpsError('internal', `OD Email Failed: ${error.message || 'Unknown error'}`, error);
     }
 });
