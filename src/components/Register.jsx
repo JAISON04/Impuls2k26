@@ -184,6 +184,8 @@ const Register = () => {
                 name: RAZORPAY_CONFIG.name,
                 description: `Registration for ${eventName}`,
                 image: "https://citimpulse.com/vite.svg",
+                // Force auto-capture (legacy override)
+                payment_capture: 1,
                 handler: async function (response) {
                     // Payment Success Handler
                     console.log("Payment Success Response:", response);
