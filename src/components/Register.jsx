@@ -13,7 +13,7 @@ import { loadRazorpay, RAZORPAY_CONFIG } from '../config/razorpay';
 const Register = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { currentUser } = useAuth();
+    const { currentUser, googleSignIn } = useAuth(); // Import googleSignIn
 
     // Extract event data from navigation state
     const {
@@ -59,11 +59,13 @@ const Register = () => {
     }, [teamCount, price, location.state]);
 
     useEffect(() => {
-        // Redirect if not logged in
+        /* 
+        // Redirect if not logged in - REMOVED to show Sign In prompt instead
         if (!currentUser) {
             navigate('/');
             return;
-        }
+        } 
+        */
 
         // Auto-fill email from Auth (name is editable)
         setFormData(prev => ({
@@ -342,190 +344,213 @@ const Register = () => {
                                     )}
                                 </div>
 
-                                <form onSubmit={handlePaymentAndSubmit} className="space-y-6">
-                                    {/* Name - Editable */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-bold text-gray-300 ml-1">Your Full Name</label>
-                                        <div className="relative">
-                                            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
-                                            <input
-                                                type="text"
-                                                name="name"
-                                                required
-                                                value={formData.name}
-                                                onChange={handleChange}
-                                                placeholder="Enter your full name"
-                                                className="w-full bg-navy-950 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:border-electric-500 focus:ring-1 focus:ring-electric-500 outline-none transition-all placeholder:text-gray-700"
-                                            />
+                                {/* Sign In Prompt */}
+                                {!currentUser && (
+                                    <div className="flex flex-col items-center justify-center py-12 space-y-6">
+                                        <div className="p-4 rounded-full bg-electric-500/10 border border-electric-500/20 text-electric-400">
+                                            <User size={48} />
                                         </div>
+                                        <h3 className="text-xl font-bold text-white text-center">Sign In Required</h3>
+                                        <p className="text-gray-400 text-center max-w-sm">
+                                            You need to be signed in to register for events. Please sign in with your Google account to continue.
+                                        </p>
+                                        <button
+                                            onClick={googleSignIn}
+                                            className="flex items-center gap-3 px-8 py-3 bg-white text-navy-950 font-bold rounded-xl hover:bg-electric-400 transition-all shadow-lg hover:shadow-electric-500/20"
+                                        >
+                                            <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
+                                            Sign in with Google
+                                        </button>
                                     </div>
+                                )}
 
-                                    {/* Team Name - Only for Team Events */}
-                                    {isTeamEvent && (
+                                {/* Registration Form - Only if Signed In */}
+                                {currentUser && (
+                                    <form onSubmit={handlePaymentAndSubmit} className="space-y-6">
+                                        {/* Name - Editable */}
                                         <div className="space-y-2">
-                                            <label className="text-sm font-bold text-gray-300 ml-1">Team Name</label>
+                                            <label className="text-sm font-bold text-gray-300 ml-1">Your Full Name</label>
                                             <div className="relative">
-                                                <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                                                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
                                                 <input
                                                     type="text"
-                                                    name="teamName"
+                                                    name="name"
                                                     required
-                                                    value={formData.teamName}
+                                                    value={formData.name}
                                                     onChange={handleChange}
-                                                    placeholder="Enter your team name"
+                                                    placeholder="Enter your full name"
                                                     className="w-full bg-navy-950 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:border-electric-500 focus:ring-1 focus:ring-electric-500 outline-none transition-all placeholder:text-gray-700"
                                                 />
                                             </div>
                                         </div>
-                                    )}
 
-                                    {/* Team Size Selector - For all team events where team size can grow */}
-                                    {isTeamEvent && maxTeamSize > 1 && (
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-bold text-gray-300 ml-1">Number of Participants</label>
-                                            <div className="flex items-center gap-4">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleTeamCountChange(-1)}
-                                                    disabled={teamCount <= minTeamSize}
-                                                    className="w-10 h-10 rounded-lg bg-navy-950 border border-white/10 flex items-center justify-center text-white hover:border-electric-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                                                >
-                                                    <Minus size={18} />
-                                                </button>
-                                                <span className="text-2xl font-bold text-electric-400 w-8 text-center">{teamCount}</span>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleTeamCountChange(1)}
-                                                    disabled={teamCount >= maxTeamSize}
-                                                    className="w-10 h-10 rounded-lg bg-navy-950 border border-white/10 flex items-center justify-center text-white hover:border-electric-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                                                >
-                                                    <Plus size={18} />
-                                                </button>
-                                                <span className="text-sm text-gray-500">Team Members (including you)</span>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Team Member Name Fields */}
-                                    {isTeamEvent && teamMembers.length > 0 && (
-                                        <div className="space-y-3 border border-electric-500/20 rounded-xl p-4 bg-navy-950/50">
-                                            <label className="text-sm font-bold text-electric-400 flex items-center gap-2">
-                                                <Users size={16} /> Team Member Names
-                                            </label>
-                                            {teamMembers.map((member, index) => (
-                                                <div key={index} className="relative">
-                                                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                                        {/* Team Name - Only for Team Events */}
+                                        {isTeamEvent && (
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-bold text-gray-300 ml-1">Team Name</label>
+                                                <div className="relative">
+                                                    <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
                                                     <input
                                                         type="text"
+                                                        name="teamName"
                                                         required
-                                                        value={member.name}
-                                                        onChange={(e) => handleTeamMemberChange(index, e.target.value)}
-                                                        placeholder={`Team Member ${index + 2} Name`}
+                                                        value={formData.teamName}
+                                                        onChange={handleChange}
+                                                        placeholder="Enter your team name"
                                                         className="w-full bg-navy-950 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:border-electric-500 focus:ring-1 focus:ring-electric-500 outline-none transition-all placeholder:text-gray-700"
                                                     />
                                                 </div>
-                                            ))}
-                                        </div>
-                                    )}
-
-                                    {/* College */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-bold text-gray-300 ml-1">College Name</label>
-                                        <div className="relative">
-                                            <Building className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
-                                            <input
-                                                type="text"
-                                                name="college"
-                                                required
-                                                value={formData.college}
-                                                onChange={handleChange}
-                                                placeholder="Institute of Technology"
-                                                className="w-full bg-navy-950 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:border-electric-500 focus:ring-1 focus:ring-electric-500 outline-none transition-all placeholder:text-gray-700"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {/* Year */}
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-bold text-gray-300 ml-1">Year of Study</label>
-                                            <div className="relative">
-                                                <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
-                                                <select
-                                                    name="year"
-                                                    required
-                                                    value={formData.year}
-                                                    onChange={handleChange}
-                                                    className="w-full bg-navy-950 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:border-electric-500 focus:ring-1 focus:ring-electric-500 outline-none transition-all appearance-none cursor-pointer"
-                                                >
-                                                    <option value="" disabled className="text-gray-700">Select Year</option>
-                                                    <option value="1">1st Year</option>
-                                                    <option value="2">2nd Year</option>
-                                                    <option value="3">3rd Year</option>
-                                                    <option value="4">4th Year</option>
-                                                </select>
                                             </div>
-                                        </div>
+                                        )}
 
-                                        {/* Phone */}
+                                        {/* Team Size Selector - For all team events where team size can grow */}
+                                        {isTeamEvent && maxTeamSize > 1 && (
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-bold text-gray-300 ml-1">Number of Participants</label>
+                                                <div className="flex items-center gap-4">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleTeamCountChange(-1)}
+                                                        disabled={teamCount <= minTeamSize}
+                                                        className="w-10 h-10 rounded-lg bg-navy-950 border border-white/10 flex items-center justify-center text-white hover:border-electric-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                                    >
+                                                        <Minus size={18} />
+                                                    </button>
+                                                    <span className="text-2xl font-bold text-electric-400 w-8 text-center">{teamCount}</span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleTeamCountChange(1)}
+                                                        disabled={teamCount >= maxTeamSize}
+                                                        className="w-10 h-10 rounded-lg bg-navy-950 border border-white/10 flex items-center justify-center text-white hover:border-electric-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                                    >
+                                                        <Plus size={18} />
+                                                    </button>
+                                                    <span className="text-sm text-gray-500">Team Members (including you)</span>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Team Member Name Fields */}
+                                        {isTeamEvent && teamMembers.length > 0 && (
+                                            <div className="space-y-3 border border-electric-500/20 rounded-xl p-4 bg-navy-950/50">
+                                                <label className="text-sm font-bold text-electric-400 flex items-center gap-2">
+                                                    <Users size={16} /> Team Member Names
+                                                </label>
+                                                {teamMembers.map((member, index) => (
+                                                    <div key={index} className="relative">
+                                                        <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                                                        <input
+                                                            type="text"
+                                                            required
+                                                            value={member.name}
+                                                            onChange={(e) => handleTeamMemberChange(index, e.target.value)}
+                                                            placeholder={`Team Member ${index + 2} Name`}
+                                                            className="w-full bg-navy-950 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:border-electric-500 focus:ring-1 focus:ring-electric-500 outline-none transition-all placeholder:text-gray-700"
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {/* College */}
                                         <div className="space-y-2">
-                                            <label className="text-sm font-bold text-gray-300 ml-1">Phone Number</label>
+                                            <label className="text-sm font-bold text-gray-300 ml-1">College Name</label>
                                             <div className="relative">
-                                                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                                                <Building className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
                                                 <input
-                                                    type="tel"
-                                                    name="phone"
+                                                    type="text"
+                                                    name="college"
                                                     required
-                                                    pattern="[0-9]{10}"
-                                                    title="Please enter a valid 10-digit number"
-                                                    value={formData.phone}
+                                                    value={formData.college}
                                                     onChange={handleChange}
-                                                    placeholder="9876543210"
+                                                    placeholder="Institute of Technology"
                                                     className="w-full bg-navy-950 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:border-electric-500 focus:ring-1 focus:ring-electric-500 outline-none transition-all placeholder:text-gray-700"
                                                 />
                                             </div>
                                         </div>
-                                    </div>
 
-                                    {/* Email */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-bold text-gray-300 ml-1">Email Address</label>
-                                        <div className="relative">
-                                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
-                                            <input
-                                                type="email"
-                                                name="email"
-                                                required
-                                                value={formData.email}
-                                                readOnly
-                                                className="w-full bg-navy-950/50 border border-white/5 rounded-xl py-3 pl-12 pr-4 text-gray-400 cursor-not-allowed outline-none"
-                                            />
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            {/* Year */}
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-bold text-gray-300 ml-1">Year of Study</label>
+                                                <div className="relative">
+                                                    <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                                                    <select
+                                                        name="year"
+                                                        required
+                                                        value={formData.year}
+                                                        onChange={handleChange}
+                                                        className="w-full bg-navy-950 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:border-electric-500 focus:ring-1 focus:ring-electric-500 outline-none transition-all appearance-none cursor-pointer"
+                                                    >
+                                                        <option value="" disabled className="text-gray-700">Select Year</option>
+                                                        <option value="1">1st Year</option>
+                                                        <option value="2">2nd Year</option>
+                                                        <option value="3">3rd Year</option>
+                                                        <option value="4">4th Year</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            {/* Phone */}
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-bold text-gray-300 ml-1">Phone Number</label>
+                                                <div className="relative">
+                                                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                                                    <input
+                                                        type="tel"
+                                                        name="phone"
+                                                        required
+                                                        pattern="[0-9]{10}"
+                                                        title="Please enter a valid 10-digit number"
+                                                        value={formData.phone}
+                                                        onChange={handleChange}
+                                                        placeholder="9876543210"
+                                                        className="w-full bg-navy-950 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:border-electric-500 focus:ring-1 focus:ring-electric-500 outline-none transition-all placeholder:text-gray-700"
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    {/* Submit Button */}
-                                    <button
-                                        type="submit"
-                                        disabled={isLoading || isPaymentLoading}
-                                        className="w-full py-4 mt-8 bg-gradient-to-r from-electric-600 to-electric-400 text-navy-950 font-black text-lg uppercase tracking-widest rounded-xl hover:shadow-[0_0_30px_#2dd4bf] hover:scale-[1.02] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                                    >
-                                        {isLoading || isPaymentLoading ? (
-                                            <>
-                                                <Loader2 className="animate-spin" /> Processing...
-                                            </>
-                                        ) : (
-                                            <>
-                                                {totalPrice > 0 ? (
-                                                    <span>Pay ₹{totalPrice} & Register</span>
-                                                ) : (
-                                                    <span>Complete Registration</span>
-                                                )}
-                                            </>
-                                        )}
-                                    </button>
+                                        {/* Email */}
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-bold text-gray-300 ml-1">Email Address</label>
+                                            <div className="relative">
+                                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                                                <input
+                                                    type="email"
+                                                    name="email"
+                                                    required
+                                                    value={formData.email}
+                                                    readOnly
+                                                    className="w-full bg-navy-950/50 border border-white/5 rounded-xl py-3 pl-12 pr-4 text-gray-400 cursor-not-allowed outline-none"
+                                                />
+                                            </div>
+                                        </div>
 
-                                    {error && <p className="text-red-500 text-center mt-4 font-bold">{error}</p>}
-                                </form>
+                                        {/* Submit Button */}
+                                        <button
+                                            type="submit"
+                                            disabled={isLoading || isPaymentLoading}
+                                            className="w-full py-4 mt-8 bg-gradient-to-r from-electric-600 to-electric-400 text-navy-950 font-black text-lg uppercase tracking-widest rounded-xl hover:shadow-[0_0_30px_#2dd4bf] hover:scale-[1.02] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        >
+                                            {isLoading || isPaymentLoading ? (
+                                                <>
+                                                    <Loader2 className="animate-spin" /> Processing...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {totalPrice > 0 ? (
+                                                        <span>Pay ₹{totalPrice} & Register</span>
+                                                    ) : (
+                                                        <span>Complete Registration</span>
+                                                    )}
+                                                </>
+                                            )}
+                                        </button>
+
+                                        {error && <p className="text-red-500 text-center mt-4 font-bold">{error}</p>}
+                                    </form>
+                                )}
                             </>
                         ) : (
                             <div className="py-12 text-center flex flex-col items-center justify-center">
@@ -603,8 +628,8 @@ const Register = () => {
                     </div>
 
                 </div>
-            </div>
-        </Section>
+            </div >
+        </Section >
     );
 };
 
