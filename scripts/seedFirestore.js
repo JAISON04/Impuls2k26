@@ -142,8 +142,8 @@ const eventsData = {
             title: 'Last Login',
             category: 'Technical',
             desc: 'Unlock the digital mysteries.',
-            details: 'Hosted by Club Celestial. A challenge of logic, coding, and problem-solving. Can you crack the code before time runs out?',
-            club: 'Club Celestial',
+            details: 'Hosted by Club Celestius. A challenge of logic, coding, and problem-solving. Can you crack the code before time runs out?',
+            club: 'Club Celestius',
             coordinators: [
                 { name: "Rudra Prasad M L", contact: "80720 29917" },
                 { name: "Adhisaya", contact: "90428 70525" }

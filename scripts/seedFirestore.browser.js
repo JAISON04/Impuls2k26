@@ -59,13 +59,13 @@
                 { name: 'Divainy J', contact: '80725 13973' }
             ],
             rules: [
-                'Team of 2 members.',
+                'Individual participation.',
                 'Safety gear (gloves) must be worn.',
                 'Circuit diagram will be provided.',
                 'Judges decision is final.'
             ],
             price: 50,
-            isTeamEvent: true,
+            isTeamEvent: false,
             minTeamSize: 1,
             maxTeamSize: 1
         },
@@ -154,8 +154,8 @@
             title: 'Last Login',
             category: 'Technical',
             desc: 'Unlock the digital mysteries.',
-            details: 'Hosted by Club Celestial. A challenge of logic, coding, and problem-solving. Can you crack the code before time runs out?',
-            club: 'Club Celestial',
+            details: 'Hosted by Club Celestius. A challenge of logic, coding, and problem-solving. Can you crack the code before time runs out?',
+            club: 'Club Celestius',
             coordinators: [
                 { name: "Rudra Prasad M L", contact: "80720 29917" }
             ],
