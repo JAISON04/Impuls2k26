@@ -24,9 +24,17 @@ const Footer = () => {
 
                 {/* Right Side: Links & Copyright */}
                 <div className="flex flex-col items-center md:items-end gap-4">
-                    <div className="flex space-x-6">
-                        <div className="flex flex-col items-end">
-                            <span className="text-gray-400 font-medium">Registration Support:</span>
+                    <div className="flex flex-col md:flex-row items-center gap-6">
+                        <a
+                            href="https://unstop.com/p/smart-energy-challenge-chennai-institute-of-technology-1618540"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-electric-400 font-bold hover:text-white transition-colors tracking-wide border-b border-electric-500/50 hover:border-electric-400 pb-0.5"
+                        >
+                            SMART ENERGY CHALLENGE
+                        </a>
+                        <div className="flex flex-col items-center md:items-end">
+                            <span className="text-gray-400 font-medium text-xs">Registration Support:</span>
                             <span className="text-electric-400 font-bold text-sm">Jaison Binu Frank - 63812 89610</span>
                         </div>
                     </div>
