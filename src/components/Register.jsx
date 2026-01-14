@@ -559,6 +559,12 @@ const Register = () => {
                                     <p className="text-xs text-gray-400">
                                         Contact the event coordinators listed in the event details page for any queries regarding rules.
                                     </p>
+                                    <h4 className="text-electric-300 font-bold text-sm mb-2">Need Help?</h4>
+                                    <p className="text-xs text-gray-400 mb-2">
+                                        For registration & payment queries:
+                                    </p>
+                                    <p className="text-sm font-bold text-white">Jaison Binu Frank</p>
+                                    <p className="text-sm text-electric-400 font-mono">63812 89610</p>
                                 </div>
                             </div>
                         </motion.div>
