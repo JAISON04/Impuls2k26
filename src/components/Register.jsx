@@ -31,6 +31,7 @@ const Register = () => {
         year: '',
         phone: '',
         email: '',
+        teamName: '',
     });
 
     // Team state - initialize to minTeamSize for team events
@@ -127,6 +128,17 @@ const Register = () => {
                 setIsPaymentLoading(false);
                 return;
             }
+            if (emptyMembers.length > 0) {
+                setError('Please enter names for all team members.');
+                setIsPaymentLoading(false);
+                return;
+            }
+        }
+
+        if (isTeamEvent && !formData.teamName.trim()) {
+            setError('Please enter a Team Name.');
+            setIsPaymentLoading(false);
+            return;
         }
 
         // Use calculated total price
@@ -239,6 +251,7 @@ const Register = () => {
                 paymentId: paymentId || 'N/A',
                 amount: totalPrice,
                 teamCount: teamCount,
+                teamName: formData.teamName || 'N/A', // Add teamName to email
                 teamMembers: teamMembers.map(m => m.name),
                 refId: newRegId
             });
@@ -346,6 +359,25 @@ const Register = () => {
                                             />
                                         </div>
                                     </div>
+
+                                    {/* Team Name - Only for Team Events */}
+                                    {isTeamEvent && (
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-bold text-gray-300 ml-1">Team Name</label>
+                                            <div className="relative">
+                                                <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                                                <input
+                                                    type="text"
+                                                    name="teamName"
+                                                    required
+                                                    value={formData.teamName}
+                                                    onChange={handleChange}
+                                                    placeholder="Enter your team name"
+                                                    className="w-full bg-navy-950 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white focus:border-electric-500 focus:ring-1 focus:ring-electric-500 outline-none transition-all placeholder:text-gray-700"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
 
                                     {/* Team Size Selector - For all team events where team size can grow */}
                                     {isTeamEvent && maxTeamSize > 1 && (
