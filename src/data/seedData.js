@@ -142,9 +142,9 @@ export const eventsData = {
                 { name: "Mathivanan V", contact: "93636 14486" }
             ],
             rules: [
-                'Individual participation.',
-                'Software provided: AutoCAD/Eagle.',
-                'Time limit: 1 hour.',
+                'Time duration: 1 hour 30 minutes.',
+                'Software not provided (Bring your own laptop).',
+                'Only KiCad software is allowed.',
                 'Judges decision is final.'
             ],
             price: 100,
