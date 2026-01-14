@@ -204,27 +204,22 @@ const AdminPanel = () => {
     };
 
     const handleGenerateOD = async (student) => {
-        if (!confirm(`Generate & Send OD Letter for ${student.name}?`)) return;
+        // Confirmation dialog updated to reflect no email is sent
+        if (!confirm(`Enable OD Letter Download for ${student.name}?`)) return;
 
         setSendingOD(student.id);
         try {
-            // 1. Call Cloud Function to send email
-            const sendODFn = httpsCallable(functions, 'sendODEmail');
-            await sendODFn({
-                email: student.email,
-                name: student.name,
-                college: student.college,
-                eventName: student.eventName
-            });
+            // REMOVED: Cloud Function call to 'sendODEmail' due to billing constraints.
+            // Logic now only enables the download button on the client side.
 
-            // 2. Update Firestore to mark OD as generated
+            // 1. Update Firestore to mark OD as generated
             const regRef = doc(db, 'registrations', student.id);
             await setDoc(regRef, {
                 odGenerated: true,
                 odGeneratedAt: serverTimestamp()
             }, { merge: true });
 
-            // 3. Update local state
+            // 2. Update local state
             setRegistrations(prev => prev.map(r =>
                 r.id === student.id ? { ...r, odGenerated: true } : r
             ));
@@ -232,10 +227,11 @@ const AdminPanel = () => {
                 r.id === student.id ? { ...r, odGenerated: true } : r
             ));
 
-            alert(`OD Letter sent successfully to ${student.email}!`);
+            // Alert updated
+            alert(`OD Letter enabled for ${student.name}. They can now download it from their Profile.`);
         } catch (err) {
-            console.error("Error sending OD:", err);
-            alert(`Failed to send OD: ${err.message}`);
+            console.error("Error generating OD:", err);
+            alert(`Failed to enable OD: ${err.message}`);
         } finally {
             setSendingOD(null);
         }
@@ -514,7 +510,7 @@ const AdminPanel = () => {
                                                 <div className="flex flex-col gap-2">
                                                     {reg.odGenerated && (
                                                         <span className="bg-green-500/10 text-green-400 px-2 py-1 rounded text-[10px] font-bold border border-green-500/20 flex items-center gap-1 w-fit">
-                                                            <CheckCircle size={10} /> Sent
+                                                            <CheckCircle size={10} /> Enabled
                                                         </span>
                                                     )}
                                                     <button
@@ -523,7 +519,7 @@ const AdminPanel = () => {
                                                         className="bg-navy-800 hover:bg-navy-700 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-white/10 flex items-center gap-2"
                                                     >
                                                         {sendingOD === reg.id ? <Loader2 className="animate-spin" size={14} /> : <FileText size={14} />}
-                                                        {reg.odGenerated ? "Resend OD" : "Generate OD"}
+                                                        {reg.odGenerated ? "Re-enable OD" : "Enable OD"}
                                                     </button>
                                                 </div>
                                             </td>

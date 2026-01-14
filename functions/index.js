@@ -161,6 +161,10 @@ exports.sendODEmail = onCall({ cors: true }, async (request) => {
     `;
 
     try {
+        if (!process.env.EMAIL_1) {
+            throw new Error("Missing Server Configuration: EMAIL_1 is undefined.");
+        }
+
         const result = await emailService.sendNotificationEmail(email, subject, htmlContent, textContent);
 
         if (result.success) {
