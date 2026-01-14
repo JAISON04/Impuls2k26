@@ -25,8 +25,6 @@ const Footer = () => {
                 {/* Right Side: Links & Copyright */}
                 <div className="flex flex-col items-center md:items-end gap-4">
                     <div className="flex space-x-6">
-                        <a href="#" className="text-gray-400 hover:text-electric-400 transition-colors font-medium hover:underline decoration-electric-500 underline-offset-4">Instagram</a>
-                        <a href="#" className="text-gray-400 hover:text-electric-400 transition-colors font-medium hover:underline decoration-electric-500 underline-offset-4">Instagram</a>
                         <div className="flex flex-col items-end">
                             <span className="text-gray-400 font-medium">Registration Support:</span>
                             <span className="text-electric-400 font-bold text-sm">Jaison Binu Frank - 63812 89610</span>
