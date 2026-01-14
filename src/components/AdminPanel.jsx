@@ -511,20 +511,21 @@ const AdminPanel = () => {
                                             <td className="p-4">{reg.year}</td>
                                             <td className="p-4 text-gray-500 text-xs whitespace-nowrap">{reg.registeredAt}</td>
                                             <td className="p-4">
-                                                {reg.odGenerated ? (
-                                                    <span className="bg-green-500/10 text-green-400 px-3 py-1.5 rounded-lg text-xs font-bold border border-green-500/20 flex items-center gap-2 w-fit">
-                                                        <CheckCircle size={14} /> OD Ready
-                                                    </span>
-                                                ) : (
+                                                <div className="flex flex-col gap-2">
+                                                    {reg.odGenerated && (
+                                                        <span className="bg-green-500/10 text-green-400 px-2 py-1 rounded text-[10px] font-bold border border-green-500/20 flex items-center gap-1 w-fit">
+                                                            <CheckCircle size={10} /> Sent
+                                                        </span>
+                                                    )}
                                                     <button
                                                         onClick={() => handleGenerateOD(reg)}
                                                         disabled={sendingOD === reg.id}
                                                         className="bg-navy-800 hover:bg-navy-700 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-white/10 flex items-center gap-2"
                                                     >
                                                         {sendingOD === reg.id ? <Loader2 className="animate-spin" size={14} /> : <FileText size={14} />}
-                                                        Generate OD
+                                                        {reg.odGenerated ? "Resend OD" : "Generate OD"}
                                                     </button>
-                                                )}
+                                                </div>
                                             </td>
                                         </tr>
                                     ))
