@@ -10,7 +10,9 @@
  *    - Save as scripts/serviceAccountKey.json
  */
 
-const admin = require('firebase-admin');
+import admin from 'firebase-admin';
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
 
 // Initialize Firebase Admin (uses GOOGLE_APPLICATION_CREDENTIALS env var or local key)
 try {
@@ -57,11 +59,14 @@ const eventsData = {
                 { name: 'Dharshini R', contact: '63833 45731' }
             ],
             rules: [
-                'Team of 2 members.',
+                'Individual participation.',
                 'Safety gear (gloves) must be worn.',
                 'Circuit diagram will be provided.',
                 'Judges decision is final.'
             ],
+            isTeamEvent: false,
+            minTeamSize: 1,
+            maxTeamSize: 1,
             price: 5
         },
         {

@@ -57,13 +57,13 @@ export const eventsData = {
                 { name: 'Divainy J', contact: '80725 13973' }
             ],
             rules: [
-                'Team of 2 members.',
+                'Individual participation.',
                 'Safety gear (gloves) must be worn.',
                 'Circuit diagram will be provided.',
                 'Judges decision is final.'
             ],
             price: 50,
-            isTeamEvent: true,
+            isTeamEvent: false,
             minTeamSize: 1,
             maxTeamSize: 1
         },
