@@ -204,18 +204,27 @@ const AdminPanel = () => {
     };
 
     const handleGenerateOD = async (student) => {
-        if (!confirm(`Generate OD Letter for ${student.name}?`)) return;
+        if (!confirm(`Generate & Send OD Letter for ${student.name}?`)) return;
 
         setSendingOD(student.id);
         try {
-            // Update Firestore to mark OD as generated
+            // 1. Call Cloud Function to send email
+            const sendODFn = httpsCallable(functions, 'sendODEmail');
+            await sendODFn({
+                email: student.email,
+                name: student.name,
+                college: student.college,
+                eventName: student.eventName
+            });
+
+            // 2. Update Firestore to mark OD as generated
             const regRef = doc(db, 'registrations', student.id);
             await setDoc(regRef, {
                 odGenerated: true,
                 odGeneratedAt: serverTimestamp()
             }, { merge: true });
 
-            // Update local state
+            // 3. Update local state
             setRegistrations(prev => prev.map(r =>
                 r.id === student.id ? { ...r, odGenerated: true } : r
             ));
@@ -223,10 +232,10 @@ const AdminPanel = () => {
                 r.id === student.id ? { ...r, odGenerated: true } : r
             ));
 
-            alert(`OD Letter generated for ${student.name}. They can now download it from their profile.`);
+            alert(`OD Letter sent successfully to ${student.email}!`);
         } catch (err) {
-            console.error(err);
-            alert(`Failed to generate OD: ${err.message}`);
+            console.error("Error sending OD:", err);
+            alert(`Failed to send OD: ${err.message}`);
         } finally {
             setSendingOD(null);
         }

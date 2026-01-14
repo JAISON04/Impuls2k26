@@ -7,47 +7,81 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
+/**
+ * Import function triggers from their respective submodules:
+ *
+ * const {onCall} = require("firebase-functions/v2/https");
+ * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
+ *
+ * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ */
+
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const logger = require("firebase-functions/logger");
-const Brevo = require('@getbrevo/brevo');
-
-const brevoClient = new Brevo.TransactionalEmailsApi();
-// Ideally this should be in secret manager, but for simplicity/demo:
-// You should set this via: firebase functions:secrets:set BREVO_API_KEY
-// For now, we'll assume it's passed or env var, or hardcoded (discouraged).
-// We will use process.env.BREVO_KEY for safety.
-const BREVO_KEY = process.env.BREVO_KEY;
-
-brevoClient.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, BREVO_KEY);
+const emailService = require("./emailService");
 
 exports.sendRegistrationEmail = onCall({ cors: true }, async (request) => {
     // Handling both data.data (if wrapped) and direct data access
     const data = request.data;
-    const { email, name, eventName, paymentId, amount, refId } = data;
+    const { email, name, eventName, paymentId, amount, refId, events, workshops, teamCount, teamName, teamMembers } = data;
 
     if (!email) {
         throw new HttpsError('invalid-argument', 'The function must be called with an "email" argument.');
     }
 
-    const sendSmtpEmail = new Brevo.SendSmtpEmail();
-    sendSmtpEmail.subject = `Registration Confirmed: ${eventName}`;
-    sendSmtpEmail.htmlContent = `<html><body>
-        <h1>Registration Confirmed!</h1>
-        <p>Hello ${name},</p>
-        <p>Thank you for registering for <b>${eventName}</b>.</p>
-        <p><strong>Ref ID:</strong> ${refId}</p>
-        <p><strong>Payment ID:</strong> ${paymentId}</p>
-        <p><strong>Amount:</strong> ₹${amount}</p>
-        <br/>
-        <p>See you at the event!</p>
-    </body></html>`;
-    sendSmtpEmail.sender = { "name": "Impulse Team", "email": "noreply@citimpulse.com" };
-    sendSmtpEmail.to = [{ "email": email, "name": name }];
+    // Adapt the flat data to the structure expected by generateRegistrationEmailTemplate
+    const registrationData = {
+        registrationId: refId || 'N/A',
+        userEmail: email,
+        name: name, // generic name field if userDetails not fully present
+        userDetails: {
+            name: name,
+            // Add other fields if available in request.data, otherwise they default to "Not provided"
+        },
+        paymentDetails: {
+            paymentId: paymentId,
+            amount: amount
+        },
+        teamDetails: {
+            teamSize: teamCount,
+            teamMembers: teamMembers ? teamMembers.map(m => ({ name: m })) : [] // Front end sends array of strings
+        },
+        teamName: teamName,
+        isTeamEvent: !!((teamCount && teamCount > 1) || (teamMembers && teamMembers.length > 0)),
+        // We might need to pass selectedEvents/Workshops if they are available in the request.
+        // Assuming 'events' and 'workshops' arrays are passed in the request or can be derived.
+        // For now, mapping simplified data or empty arrays if not provided.
+        selectedEvents: events || [{ title: eventName }], // Fallback to eventName from request
+        selectedWorkshops: workshops || []
+    };
+
+    // We need a list of all events/workshops to lookup details. 
+    // If these are not passed, the template might show empty details or we need to fetch them.
+    // For this implementation, we assume the client passes necessary details or we pass empty to just confirm registration.
+    // However, the template logic heavily relies on finding these in the 'events' and 'workshops' arrays passed as 2nd/3rd args.
+    // If the client doesn't send full catalog, we might only see IDs.
+
+    // In a real scenario, we might want to fetch these from Firestore here, OR expect the client to pass the resolved details.
+    // Given the previous code was simple text, we'll try to do our best.
+
+    // For now, we will pass the data as is.
 
     try {
-        const result = await brevoClient.sendTransacEmail(sendSmtpEmail);
-        logger.info("Email sent successfully", { result });
-        return { success: true, messageId: result.messageId };
+        const result = await emailService.sendRegistrationConfirmationEmail(
+            registrationData,
+            events || [], // Pass full event list if available
+            workshops || [] // Pass full workshop list if available
+        );
+
+        if (result.success) {
+            logger.info("Email sent successfully", { messageId: result.messageId });
+            return { success: true, messageId: result.messageId };
+        } else {
+            logger.error("Failed to send email", result.error);
+            // Verify if it is a specific error we want to expose
+            throw new HttpsError('internal', result.error || 'Unable to send email');
+        }
+
     } catch (error) {
         logger.error("Error sending email", error);
         throw new HttpsError('internal', 'Unable to send email', error);
@@ -62,9 +96,8 @@ exports.sendODEmail = onCall({ cors: true }, async (request) => {
         throw new HttpsError('invalid-argument', 'The function must be called with an "email" argument.');
     }
 
-    const sendSmtpEmail = new Brevo.SendSmtpEmail();
-    sendSmtpEmail.subject = `On-Duty Letter: Impulse 2026 - ${name}`;
-    sendSmtpEmail.htmlContent = `
+    const subject = `On-Duty Letter: Impulse 2026 - ${name}`;
+    const htmlContent = `
     <html>
     <head>
         <style>
@@ -112,13 +145,30 @@ exports.sendODEmail = onCall({ cors: true }, async (request) => {
     </body>
     </html>`;
 
-    sendSmtpEmail.sender = { "name": "Impulse Team", "email": "noreply@citimpulse.com" };
-    sendSmtpEmail.to = [{ "email": email, "name": name }];
+    const textContent = `
+    CHENNAI INSTITUTE OF TECHNOLOGY
+    On-Duty Request for Student Participation in IMPULSE 2026
+    
+    To: The Principal / HOD, ${college}
+    
+    This is to certify that ${name} is a registered participant for IMPULSE 2026.
+    The event is scheduled to be held on ${eventDate || 'March 20, 2026'}.
+    We kindly request you to grant On-Duty (OD) to this student.
+    
+    Thank you,
+    Convenor - IMPULSE 2026
+    `;
 
     try {
-        const result = await brevoClient.sendTransacEmail(sendSmtpEmail);
-        logger.info("OD Email sent successfully", { result });
-        return { success: true, messageId: result.messageId };
+        const result = await emailService.sendNotificationEmail(email, subject, htmlContent, textContent);
+
+        if (result.success) {
+            logger.info("OD Email sent successfully", { messageId: result.messageId });
+            return { success: true, messageId: result.messageId };
+        } else {
+            logger.error("Failed to send OD email", result.error);
+            throw new HttpsError('internal', result.error || 'Unable to send OD email');
+        }
     } catch (error) {
         logger.error("Error sending OD email", error);
         throw new HttpsError('internal', 'Unable to send OD email', error);
