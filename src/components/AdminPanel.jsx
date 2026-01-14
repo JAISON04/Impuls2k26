@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, orderBy, query, addDoc, serverTimestamp, setDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, addDoc, serverTimestamp, setDoc, doc, deleteDoc } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { db, functions } from '../firebase';
 import { eventsData, workshopsData } from '../data/seedData';
@@ -236,7 +236,16 @@ const AdminPanel = () => {
         if (!confirm("This will overwrite existing events/workshops in DB. Continue?")) return;
         setLoading(true);
         try {
-            // Seed Events
+            // 1. Clear existing Collections
+            const collectionNames = ['events', 'workshops'];
+            for (const name of collectionNames) {
+                const q = query(collection(db, name));
+                const snapshot = await getDocs(q);
+                const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
+                await Promise.all(deletePromises);
+            }
+
+            // 2. Seed Events
             const eventPromises = [
                 ...eventsData.technical.map(e => setDoc(doc(db, 'events', `tech_${e.id}`), { ...e, category: 'Technical' })),
                 ...eventsData.online.map(e => setDoc(doc(db, 'events', `online_${e.id}`), { ...e, category: 'Online' }))
