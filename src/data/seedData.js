@@ -184,14 +184,19 @@ export const eventsData = {
                 { name: "T Rajamathi", contact: "87780 03748" }
             ],
             rules: [
-                'Team of 2 members.',
-                'Components provided.',
-                'Judges decision is final.'
+                'Teams must have 2–3 members.',
+                'No changes after the event starts.',
+                'Questions are based on EEE concepts using images, symbols, or emojis.',
+                'Answers must be identified within the given time.',
+                'Mobile phones and external help are strictly prohibited.',
+                'Only one team member may answer.',
+                'Judges’ decisions are final.',
+                'Malpractice leads to disqualification.'
             ],
             price: 50,
             isTeamEvent: true,
-            minTeamSize: 1,
-            maxTeamSize: 2
+            minTeamSize: 2,
+            maxTeamSize: 3
         },
         {
             id: 9,
@@ -358,6 +363,7 @@ export const workshopsData = [
         rules: [
             'Interest in space science required.',
             'Interactive session.',
+            'Laptop are Mandatory.',
             'Certificates provided upon completion.'
         ],
         price: 150
