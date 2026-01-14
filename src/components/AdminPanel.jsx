@@ -99,7 +99,7 @@ const AdminPanel = () => {
                 const allEvents = [...eventsData.technical, ...eventsData.online, ...workshopsData];
                 const foundEvent = allEvents.find(e => e.title === event);
                 const estimatedPrice = foundEvent ? foundEvent.price : 50;
-                totalPrice += (item.teamCount || 1) * estimatedPrice;
+                totalRevenue += (item.teamCount || 1) * estimatedPrice;
             }
         });
 
