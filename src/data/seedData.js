@@ -96,7 +96,7 @@ export const eventsData = {
             details: 'Present your technical papers on cutting-edge technologies. A platform to share knowledge, innovations, and research findings with a panel of experts.',
             coordinators: [
                 { name: 'J Jerauld Alwin', contact: '94983 50881' },
-                { name: 'Jaya Sudha', contact: '63827 55248' },
+                { name: 'Jaya Sudha S', contact: '63827 55248' },
 
             ],
             rules: [
