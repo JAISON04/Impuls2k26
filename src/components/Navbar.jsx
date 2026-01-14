@@ -15,11 +15,14 @@ const Navbar = () => {
         { name: 'Events', path: '/events', type: 'route' },
         { name: 'Workshops', path: '/workshops', type: 'route' },
         { name: 'Online Events', path: '/online-events', type: 'route' },
+        { name: 'Smart Energy Challenge', path: 'https://unstop.com/p/smart-energy-challenge-chennai-institute-of-technology-1618540', type: 'external' },
     ];
 
     const toggleMenu = () => setIsOpen(!isOpen);
 
     const handleNavigation = (e, link) => {
+        if (link.type === 'external') return; // Allow default behavior for external links
+
         e.preventDefault();
         setIsOpen(false);
 
@@ -84,6 +87,8 @@ const Navbar = () => {
                         <a
                             key={link.name}
                             href={link.path}
+                            target={link.type === 'external' ? "_blank" : "_self"}
+                            rel={link.type === 'external' ? "noopener noreferrer" : ""}
                             onClick={(e) => handleNavigation(e, link)}
                             className={`
                                     relative px-4 lg:px-5 py-2.5 rounded-xl text-sm font-medium tracking-wide transition-all duration-300
@@ -130,6 +135,8 @@ const Navbar = () => {
                                 <a
                                     key={link.name}
                                     href={link.path}
+                                    target={link.type === 'external' ? "_blank" : "_self"}
+                                    rel={link.type === 'external' ? "noopener noreferrer" : ""}
                                     onClick={(e) => handleNavigation(e, link)}
                                     className={`
                                         text-center py-3 rounded-xl transition-all font-medium
