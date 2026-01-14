@@ -5,6 +5,7 @@ import IntroOverlay from './components/IntroOverlay';
 import ElectricBackground from './components/ElectricBackground';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
+import Countdown from './components/Countdown';
 
 import AboutCIT from './components/AboutCIT';
 import AboutImpulse from './components/AboutImpulse';
@@ -23,6 +24,7 @@ import CustomCursor from './components/CustomCursor';
 const Home = () => (
   <>
     <Hero />
+    <Countdown />
     <Events previewMode={true} />
     <Workshops previewMode={true} />
     <AboutCIT />

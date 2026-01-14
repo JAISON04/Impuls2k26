@@ -4,7 +4,7 @@ import Section from './Section';
 
 const Countdown = () => {
     // Set target date (e.g., 2 weeks from now)
-    const targetDate = new Date("2026-03-24T09:00:00").getTime();
+    const targetDate = new Date("2026-02-06T09:00:00").getTime();
 
     const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
     const [isSticky, setIsSticky] = useState(false);
@@ -100,7 +100,7 @@ const Countdown = () => {
                 {/* Title - Hide when sticky */}
                 <div className={`flex flex-col items-center mb-12 transition-all duration-300 ${isSticky ? 'hidden opacity-0 h-0 mb-0' : 'opacity-100'}`}>
                     <h3 className="text-xl md:text-2xl font-bold text-electric-500 tracking-widest uppercase mb-2">
-                        System Launch In
+                        Impulse Launches In
                     </h3>
                     <motion.div
                         className="h-1 w-24 bg-electric-400 rounded-full"
