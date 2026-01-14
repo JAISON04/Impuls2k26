@@ -57,7 +57,7 @@ export const eventsData = {
                 { name: 'Divainy J', contact: '80725 13973' }
             ],
             rules: [
-                'Individual participation.',
+
                 'Safety gear (gloves) must be worn.',
                 'Circuit diagram will be provided.',
                 'Judges decision is final.'

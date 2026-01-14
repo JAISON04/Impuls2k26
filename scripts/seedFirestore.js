@@ -59,7 +59,7 @@ const eventsData = {
                 { name: 'Dharshini R', contact: '63833 45731' }
             ],
             rules: [
-                'Individual participation.',
+
                 'Safety gear (gloves) must be worn.',
                 'Circuit diagram will be provided.',
                 'Judges decision is final.'
