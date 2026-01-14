@@ -79,7 +79,7 @@
                 { name: 'Vimal Dheep AL', contact: '96297 91556' }
             ],
             rules: [
-                'Team of 2 members.',
+                'Team of 3 members.',
                 'No electronic gadgets allowed.',
                 'Quiz specific rules will be announced on spot.',
                 'Judges decision is final.'
@@ -173,7 +173,7 @@
             title: 'Electrolink',
             category: 'Technical',
             desc: 'Forge the connections.',
-            details: 'A circuit design and linking challenge. Understand the flow, connect the components, and make the system live.',
+            details: 'Participants will be given images as clues and must observe, analyze, and connect them to identify the correct technical concept. Test your visual thinking, speed, and core engineering knowledge in this exciting challenge!',
             coordinators: [
                 { name: "Kavin Aravind G", contact: "63828 63773" },
                 { name: "T Rajamathi", contact: "87780 03748" }
@@ -203,7 +203,7 @@
                 { name: "Shivani Sri S", contact: "91502 04514" }
             ],
             rules: [
-                'Team of 2-3 members.',
+                'Team of 2-4 members.',
                 'Critical thinking required.',
                 'Judges decision is final.'
             ],
