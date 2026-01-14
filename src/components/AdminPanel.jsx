@@ -27,7 +27,7 @@ const AdminPanel = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [manualForm, setManualForm] = useState({
         name: '', college: '', year: '', phone: '', email: '', eventName: '', price: 5,
-        name: '', college: '', year: '', phone: '', email: '', eventName: '', price: 5,
+
         isTeamEvent: false,
         isFixedPrice: false,
         teamCount: 1,
@@ -95,7 +95,11 @@ const AdminPanel = () => {
             if (item.totalPrice) {
                 totalRevenue += parseFloat(item.totalPrice);
             } else {
-                totalRevenue += (item.teamCount || 1) * 5; // Fallback
+                // Better fallback: lookup current price based on event name, or default to 50 (avg tech event price)
+                const allEvents = [...eventsData.technical, ...eventsData.online, ...workshopsData];
+                const foundEvent = allEvents.find(e => e.title === event);
+                const estimatedPrice = foundEvent ? foundEvent.price : 50;
+                totalPrice += (item.teamCount || 1) * estimatedPrice;
             }
         });
 
@@ -138,7 +142,7 @@ const AdminPanel = () => {
             if (manualForm.isFixedPrice) {
                 totalPrice = parseFloat(manualForm.price) || 0;
             } else {
-                totalPrice = (manualForm.teamCount || 1) * (parseFloat(manualForm.price) || 5);
+                totalPrice = (manualForm.teamCount || 1) * (parseFloat(manualForm.price) || 0);
             }
 
             // 1. Add to Firestore
@@ -609,7 +613,7 @@ const AdminPanel = () => {
                                                     setManualForm(prev => ({
                                                         ...prev,
                                                         eventName: selectedName,
-                                                        price: selectedEvent.price || 5,
+                                                        price: selectedEvent.price || 0,
                                                         isTeamEvent: selectedEvent.isTeamEvent || false,
                                                         isFixedPrice: selectedEvent.isFixedPrice || false,
                                                         teamCount: (selectedEvent.isTeamEvent || false) ? prev.teamCount : 1,
