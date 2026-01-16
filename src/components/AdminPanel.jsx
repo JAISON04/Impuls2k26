@@ -4,7 +4,7 @@ import { httpsCallable } from 'firebase/functions';
 import { db, functions } from '../firebase';
 import { eventsData, workshopsData } from '../data/seedData';
 import * as XLSX from 'xlsx';
-import { Download, Table, Loader2, AlertCircle, Users, IndianRupee, FileText, Search, LogOut, CheckCircle, Database, Plus, Minus, User } from 'lucide-react';
+import { Download, Table, Loader2, AlertCircle, Users, IndianRupee, FileText, Search, LogOut, CheckCircle, Database, Plus, Minus, User, Eye, Mail, MessageSquare, Phone, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Section from './Section';
 
@@ -21,6 +21,7 @@ const AdminPanel = () => {
     const [loading, setLoading] = useState(false); // Only load after login
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [expandedRows, setExpandedRows] = useState(new Set());
 
     // Manual Registration State
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -453,24 +454,82 @@ const AdminPanel = () => {
                         </div>
                     </div>
 
+                    {/* Helper Functions */}
+                    {(() => {
+                        // Get event counts for a user (by phone number)
+                        const getEventCounts = (phone) => {
+                            const userRegs = filteredData.filter(r => r.phone === phone);
+                            let events = 0, workshops = 0, intEvents = 0;
+
+                            userRegs.forEach(reg => {
+                                const eventName = reg.eventName;
+                                // Check if it's a workshop
+                                const isWorkshop = workshopsData.some(w => w.title === eventName);
+                                // Check if it's an online/international event
+                                const isOnline = eventsData.online?.some(e => e.title === eventName);
+
+                                if (isWorkshop) {
+                                    workshops++;
+                                } else if (isOnline) {
+                                    intEvents++;
+                                } else {
+                                    events++;
+                                }
+                            });
+
+                            return { events, workshops, intEvents };
+                        };
+
+                        // Toggle team member expansion
+                        const toggleExpanded = (regId) => {
+                            const newSet = new Set(expandedRows);
+                            if (newSet.has(regId)) {
+                                newSet.delete(regId);
+                            } else {
+                                newSet.add(regId);
+                            }
+                            setExpandedRows(newSet);
+                        };
+
+                        // Action button handlers
+                        const handleViewDetails = (reg) => {
+                            alert(`Viewing details for ${reg.name}\n\nEvent: ${reg.eventName}\nCollege: ${reg.college}\nPhone: ${reg.phone}\nEmail: ${reg.email}`);
+                        };
+
+                        const handleSendEmail = (reg) => {
+                            window.open(`mailto:${reg.email}?subject=Impulse 2026 - ${reg.eventName}`, '_blank');
+                        };
+
+                        const handleSendMessage = (reg) => {
+                            alert(`Opening message to ${reg.name}...`);
+                        };
+
+                        const handleCall = (reg) => {
+                            window.open(`tel:${reg.phone}`, '_blank');
+                        };
+
+                        return null;
+                    })()}
+
                     {/* Table Content */}
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-white/5 text-gray-400 text-xs uppercase tracking-wider border-b border-white/10">
-                                    <th className="p-4 font-bold">Student Name</th>
-                                    <th className="p-4 font-bold">Event Registered</th>
+                                    <th className="p-4 font-bold">Name</th>
                                     <th className="p-4 font-bold">College</th>
-                                    <th className="p-4 font-bold">Contact</th>
-                                    <th className="p-4 font-bold">Year</th>
-                                    <th className="p-4 font-bold">Date</th>
-                                    <th className="p-4 font-bold">Action</th>
+                                    <th className="p-4 font-bold">Events</th>
+                                    <th className="p-4 font-bold">Team</th>
+                                    <th className="p-4 font-bold">Status</th>
+                                    <th className="p-4 font-bold">Last Edit</th>
+                                    <th className="p-4 font-bold">Arrival</th>
+                                    <th className="p-4 font-bold">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
                                 {loading ? (
                                     <tr>
-                                        <td colSpan="7" className="p-12 text-center text-electric-400">
+                                        <td colSpan="8" className="p-12 text-center text-electric-400">
                                             <div className="flex flex-col items-center justify-center gap-2">
                                                 <Loader2 className="animate-spin" size={32} />
                                                 <span className="text-sm">Loading data...</span>
@@ -479,52 +538,203 @@ const AdminPanel = () => {
                                     </tr>
                                 ) : filteredData.length === 0 ? (
                                     <tr>
-                                        <td colSpan="7" className="p-8 text-center text-gray-500 italic">
+                                        <td colSpan="8" className="p-8 text-center text-gray-500 italic">
                                             {searchTerm ? 'No matching records found.' : 'No registrations found yet.'}
                                         </td>
                                     </tr>
                                 ) : (
-                                    filteredData.map((reg) => (
-                                        <tr key={reg.id} className="hover:bg-white/5 transition-colors text-sm text-gray-300">
-                                            <td className="p-4 font-bold text-white">
-                                                {reg.name}
-                                                {reg.teamCount > 1 && (
-                                                    <span className="block text-xs font-normal text-electric-400 mt-1">
-                                                        + {reg.teamCount - 1} team members
+                                    filteredData.map((reg) => {
+                                        const { events, workshops, intEvents } = (() => {
+                                            const userRegs = registrations.filter(r => r.phone === reg.phone);
+                                            let e = 0, w = 0, i = 0;
+
+                                            userRegs.forEach(r => {
+                                                const eventName = r.eventName;
+                                                const isWorkshop = workshopsData.some(ws => ws.title === eventName);
+                                                const isOnline = eventsData.online?.some(ev => ev.title === eventName);
+
+                                                if (isWorkshop) w++;
+                                                else if (isOnline) i++;
+                                                else e++;
+                                            });
+
+                                            return { events: e, workshops: w, intEvents: i };
+                                        })();
+
+                                        const isExpanded = expandedRows.has(reg.id);
+                                        const teamMembers = reg.teamMembers || [];
+                                        const isTeam = reg.teamCount > 1 || teamMembers.length > 0;
+                                        const additionalMembers = teamMembers.length;
+
+                                        // Mock data for new fields (can be replaced with real data)
+                                        const editCount = reg.editCount || 0;
+                                        const lastEditBy = reg.lastEditBy || 'admin';
+                                        const lastEditDate = reg.lastEditDate || reg.registeredAt;
+                                        const arrivalTime = reg.arrivalTime || null;
+
+                                        return (
+                                            <tr key={reg.id} className="hover:bg-white/5 transition-colors text-sm text-gray-300">
+                                                {/* Name Column */}
+                                                <td className="p-4">
+                                                    <div className="font-bold text-white text-left">{reg.name}</div>
+                                                </td>
+
+                                                {/* College Column */}
+                                                <td className="p-4">
+                                                    <div className="text-gray-400 text-sm">{reg.college}</div>
+                                                </td>
+
+                                                {/* Events Column - Compact Stacked */}
+                                                <td className="p-4">
+                                                    <div className="text-xs leading-tight">
+                                                        <div className="text-gray-300">E: {events} | W: {workshops}</div>
+                                                        <div className="text-gray-400">INT: {intEvents}</div>
+                                                    </div>
+                                                </td>
+
+                                                {/* Team Column - Pills and Expandable */}
+                                                <td className="p-4">
+                                                    <div className="flex flex-col gap-2">
+                                                        {isTeam ? (
+                                                            <>
+                                                                <span className="bg-blue-500/10 text-blue-400 px-2 py-1 rounded-full text-xs font-bold border border-blue-500/20 w-fit">
+                                                                    Team
+                                                                </span>
+                                                                <div className="text-xs text-gray-400">
+                                                                    {reg.teamCount || (teamMembers.length + 1)} members
+                                                                </div>
+                                                                {additionalMembers > 0 && (
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            const newSet = new Set(expandedRows);
+                                                                            if (newSet.has(reg.id)) {
+                                                                                newSet.delete(reg.id);
+                                                                            } else {
+                                                                                newSet.add(reg.id);
+                                                                            }
+                                                                            setExpandedRows(newSet);
+                                                                        }}
+                                                                        className="text-electric-400 text-xs hover:text-electric-300 flex items-center gap-1 transition-colors"
+                                                                    >
+                                                                        {isExpanded ? (
+                                                                            <>
+                                                                                <ChevronUp size={12} /> Hide members
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <ChevronDown size={12} /> +{additionalMembers} more
+                                                                            </>
+                                                                        )}
+                                                                    </button>
+                                                                )}
+                                                                {isExpanded && additionalMembers > 0 && (
+                                                                    <div className="mt-1 pl-2 border-l-2 border-electric-500/30 space-y-1">
+                                                                        {teamMembers.map((member, idx) => (
+                                                                            <div key={idx} className="text-xs text-gray-400">
+                                                                                {member.name || `Member ${idx + 2}`}
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                )}
+                                                            </>
+                                                        ) : (
+                                                            <span className="bg-gray-500/10 text-gray-400 px-2 py-1 rounded-full text-xs font-bold border border-gray-500/20 w-fit">
+                                                                Individual
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </td>
+
+                                                {/* Status Column - Green Pill */}
+                                                <td className="p-4">
+                                                    <span className="bg-green-500/10 text-green-400 px-3 py-1 rounded-full text-xs font-bold border border-green-500/20 inline-flex items-center gap-1">
+                                                        <CheckCircle size={10} />
+                                                        confirmed
                                                     </span>
-                                                )}
-                                            </td>
-                                            <td className="p-4">
-                                                <span className="bg-electric-500/10 text-electric-400 px-2 py-1 rounded text-xs font-bold border border-electric-500/20">
-                                                    {reg.eventName}
-                                                </span>
-                                            </td>
-                                            <td className="p-4 text-gray-400">{reg.college}</td>
-                                            <td className="p-4 font-mono text-xs">
-                                                <div>{reg.phone}</div>
-                                                <div className="text-gray-500">{reg.email}</div>
-                                            </td>
-                                            <td className="p-4">{reg.year}</td>
-                                            <td className="p-4 text-gray-500 text-xs whitespace-nowrap">{reg.registeredAt}</td>
-                                            <td className="p-4">
-                                                <div className="flex flex-col gap-2">
-                                                    {reg.odGenerated && (
-                                                        <span className="bg-green-500/10 text-green-400 px-2 py-1 rounded text-[10px] font-bold border border-green-500/20 flex items-center gap-1 w-fit">
-                                                            <CheckCircle size={10} /> Enabled
-                                                        </span>
+                                                </td>
+
+                                                {/* Last Edit Column */}
+                                                <td className="p-4">
+                                                    <div className="text-xs space-y-1">
+                                                        <div className="text-yellow-400 font-semibold">
+                                                            {editCount === 0 ? 'No edits' : `${editCount} edit${editCount > 1 ? 's' : ''}`}
+                                                        </div>
+                                                        <div className="text-gray-500">By {lastEditBy}</div>
+                                                        <div className="text-gray-500 text-[10px]">
+                                                            {typeof lastEditDate === 'string' ? lastEditDate : new Date().toLocaleDateString()}
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+                                                {/* Arrival Column */}
+                                                <td className="p-4">
+                                                    {arrivalTime ? (
+                                                        <div className="flex items-center gap-2 text-green-400">
+                                                            <CheckCircle size={14} />
+                                                            <span className="text-xs font-medium">
+                                                                {typeof arrivalTime === 'string' ? arrivalTime : '08:02 PM'}
+                                                            </span>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="text-gray-500 text-xs">Not arrived</div>
                                                     )}
-                                                    <button
-                                                        onClick={() => handleGenerateOD(reg)}
-                                                        disabled={sendingOD === reg.id}
-                                                        className="bg-navy-800 hover:bg-navy-700 disabled:opacity-50 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all border border-white/10 flex items-center gap-2"
-                                                    >
-                                                        {sendingOD === reg.id ? <Loader2 className="animate-spin" size={14} /> : <FileText size={14} />}
-                                                        {reg.odGenerated ? "Re-enable OD" : "Enable OD"}
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
+                                                </td>
+
+                                                {/* Actions Column - Icon Buttons */}
+                                                <td className="p-4">
+                                                    <div className="flex items-center gap-2">
+                                                        {/* View */}
+                                                        <button
+                                                            onClick={() => {
+                                                                alert(`Viewing details for ${reg.name}\n\nEvent: ${reg.eventName}\nCollege: ${reg.college}\nPhone: ${reg.phone}\nEmail: ${reg.email}`);
+                                                            }}
+                                                            className="p-2 rounded-lg bg-navy-800 hover:bg-navy-700 text-gray-300 hover:text-white border border-white/10 hover:border-electric-500/50 transition-all hover:shadow-[0_0_15px_rgba(45,212,191,0.3)] hover:scale-110"
+                                                            title="View Details"
+                                                        >
+                                                            <Eye size={16} />
+                                                        </button>
+
+                                                        {/* Download (OD) */}
+                                                        <button
+                                                            onClick={() => handleGenerateOD(reg)}
+                                                            disabled={sendingOD === reg.id}
+                                                            className="p-2 rounded-lg bg-navy-800 hover:bg-navy-700 text-gray-300 hover:text-white border border-white/10 hover:border-green-500/50 transition-all hover:shadow-[0_0_15px_rgba(34,197,94,0.3)] hover:scale-110 disabled:opacity-50"
+                                                            title={reg.odGenerated ? "Re-enable OD" : "Enable OD Download"}
+                                                        >
+                                                            {sendingOD === reg.id ? <Loader2 className="animate-spin" size={16} /> : <Download size={16} />}
+                                                        </button>
+
+                                                        {/* Email */}
+                                                        <button
+                                                            onClick={() => window.open(`mailto:${reg.email}?subject=Impulse 2026 - ${reg.eventName}`, '_blank')}
+                                                            className="p-2 rounded-lg bg-navy-800 hover:bg-navy-700 text-gray-300 hover:text-white border border-white/10 hover:border-blue-500/50 transition-all hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:scale-110"
+                                                            title="Send Email"
+                                                        >
+                                                            <Mail size={16} />
+                                                        </button>
+
+                                                        {/* Message */}
+                                                        <button
+                                                            onClick={() => alert(`Opening message to ${reg.name}...`)}
+                                                            className="p-2 rounded-lg bg-navy-800 hover:bg-navy-700 text-gray-300 hover:text-white border border-white/10 hover:border-purple-500/50 transition-all hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] hover:scale-110"
+                                                            title="Send Message"
+                                                        >
+                                                            <MessageSquare size={16} />
+                                                        </button>
+
+                                                        {/* Call */}
+                                                        <button
+                                                            onClick={() => window.open(`tel:${reg.phone}`, '_blank')}
+                                                            className="p-2 rounded-lg bg-navy-800 hover:bg-navy-700 text-gray-300 hover:text-white border border-white/10 hover:border-pink-500/50 transition-all hover:shadow-[0_0_15px_rgba(236,72,153,0.3)] hover:scale-110"
+                                                            title="Call"
+                                                        >
+                                                            <Phone size={16} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
                                 )}
                             </tbody>
                         </table>
