@@ -37,6 +37,11 @@ const CoordinatorCard = ({ name, role, image, delay, number }) => (
                         src={image}
                         alt={name}
                         className="w-full h-full object-cover rounded-full filter grayscale group-hover:grayscale-0 transition-all duration-700"
+                        style={{
+                            objectPosition: name === "Harikesh" ? "center 30%" :
+                                name === "Blessie Pearlyn" ? "center 40%" :
+                                    "center center"
+                        }}
                     />
                 </motion.div>
 
