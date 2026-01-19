@@ -36,7 +36,7 @@ const CoordinatorCard = ({ name, role, image, delay, number }) => (
                     <img
                         src={image}
                         alt={name}
-                        className={name === "Kamalanathan" ? "w-full h-full object-cover rounded-full filter grayscale group-hover:grayscale-0 transition-all duration-700" : "w-full h-full object-fit rounded-full filter grayscale group-hover:grayscale-0 transition-all duration-700"}
+                        className="w-full h-full object-cover rounded-full filter grayscale group-hover:grayscale-0 transition-all duration-700"
                     />
                 </motion.div>
 
