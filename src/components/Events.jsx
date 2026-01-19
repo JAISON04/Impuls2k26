@@ -146,6 +146,14 @@ export const EventCard = ({ event, onClick }) => {
         return <Cpu size={16} />;
     };
 
+    const handleClick = () => {
+        if (event.externalUrl) {
+            window.open(event.externalUrl, '_blank');
+        } else {
+            onClick(event);
+        }
+    };
+
     return (
         <motion.div
             className="group relative overflow-hidden rounded-xl bg-navy-900/40 border border-electric-500/20 shadow-lg hover:shadow-[0_0_30px_rgba(45,212,191,0.3)] transition-all duration-300 cursor-pointer"
@@ -153,7 +161,7 @@ export const EventCard = ({ event, onClick }) => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            onClick={() => onClick(event)}
+            onClick={handleClick}
         >
             <div className="h-48 overflow-hidden relative">
                 <div className="absolute inset-0 bg-gradient-to-t from-navy-950 to-transparent z-10 opacity-60 group-hover:opacity-30 transition-opacity" />
@@ -176,7 +184,7 @@ export const EventCard = ({ event, onClick }) => {
                 </p>
                 <div className="flex justify-between items-center mt-4">
                     <span className="text-xs font-bold tracking-wider text-electric-400 uppercase border border-electric-500/30 px-3 py-1 rounded group-hover:bg-electric-500 group-hover:text-navy-950 transition-all">
-                        View Details
+                        {event.externalUrl ? 'Register on Unstop' : 'View Details'}
                     </span>
                     {event.club && (
                         <span className="text-[10px] text-gray-500 uppercase tracking-widest">{event.club}</span>

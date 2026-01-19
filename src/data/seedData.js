@@ -151,7 +151,8 @@ export const eventsData = {
             isTeamEvent: true,
             isFixedPrice: true,
             minTeamSize: 1,
-            maxTeamSize: 3
+            maxTeamSize: 3,
+            externalUrl: 'https://unstop.com/competitions/e-cadathon-impulse-2026-chennai-institute-of-technology-1621391'
         },
         {
             id: 7,
