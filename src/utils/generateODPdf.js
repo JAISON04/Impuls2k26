@@ -189,7 +189,7 @@ export const generateODPdf = (data) => {
     doc.text('Thanking you,', margin, yPos);
     yPos += 5;
     doc.text('Yours faithfully,', margin, yPos);
-    yPos += 1;
+    yPos += 5;
 
     // Signature Block
     doc.setFont('helvetica', 'bold');
