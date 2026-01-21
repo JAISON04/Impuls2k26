@@ -245,8 +245,8 @@ const AdminPanel = () => {
         setSendingOD(student.id);
         try {
             // 1. Generate PDF Base64
-            // Pass plain object with returnBase64: true
-            const pdfBase64 = generateODPdf({ ...student, returnBase64: true });
+            // Pass plain object with returnBase64: true and refId for consistent reference number
+            const pdfBase64 = generateODPdf({ ...student, refId: student.id, returnBase64: true });
 
             // 2. Call API
             // Use relative path '/api/send-od-email' for Vercel
