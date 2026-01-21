@@ -142,8 +142,8 @@ export const generateODPdf = (data) => {
 
     const leftColX = margin + 8;
     const rightColX = pageWidth / 2 + 10;
-    const leftLabelWidth = 28;   // For "Name:" and "Event:"
-    const rightLabelWidth = 22;  // For "Year:" and "College:" (shorter labels)
+    const leftLabelWidth = 18;   // For "Name:" and "Event:"
+    const rightLabelWidth = 20;  // For "Year:" and "College:"
 
     // Row 1
     doc.setFont('helvetica', 'bold');
