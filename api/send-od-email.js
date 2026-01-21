@@ -64,7 +64,7 @@ export default async function handler(req, res) {
           
           <div style="text-align: center; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
             <p style="color: #666; font-size: 12px; margin: 0;">
-              For any queries, contact us at impulse2026@citimpulse.com<br><br>
+              For any queries, contact us at jaisonbinufrank@gmail.com<br><br>
               © 2026 IMPULSE - EEE Department Symposium
             </p>
           </div>
