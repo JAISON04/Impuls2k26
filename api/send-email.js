@@ -1,43 +1,43 @@
 // Vercel Serverless Function for sending emails via Brevo API
 
 export default async function handler(req, res) {
-    // Only allow POST requests
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
+  // Only allow POST requests
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Validate API Key
+  const apiKey = req.headers['x-api-key'];
+  const validKey = process.env.CLIENT_KEY;
+
+  if (!apiKey || apiKey !== validKey) {
+    return res.status(403).json({
+      success: false,
+      error: 'Forbidden: Invalid or missing API Key'
+    });
+  }
+
+  const { to, name, event, college, year, amount, transactionId } = req.body;
+
+  // Basic Validation
+  if (!to || !name || !event) {
+    return res.status(400).json({
+      success: false,
+      error: 'Missing required fields: to, name, event'
+    });
+  }
+
+  try {
+    console.log(`📨 Sending email to ${to} for event: ${event}`);
+
+    const brevoUrl = 'https://api.brevo.com/v3/smtp/email';
+    const brevoApiKey = process.env.BREVO_API_KEY;
+
+    if (!brevoApiKey) {
+      throw new Error('Server misconfiguration: BREVO_API_KEY is missing');
     }
 
-    // Validate API Key
-    const apiKey = req.headers['x-api-key'];
-    const validKey = process.env.CLIENT_KEY;
-
-    if (!apiKey || apiKey !== validKey) {
-        return res.status(403).json({
-            success: false,
-            error: 'Forbidden: Invalid or missing API Key'
-        });
-    }
-
-    const { to, name, event, college, year, amount, transactionId } = req.body;
-
-    // Basic Validation
-    if (!to || !name || !event) {
-        return res.status(400).json({
-            success: false,
-            error: 'Missing required fields: to, name, event'
-        });
-    }
-
-    try {
-        console.log(`📨 Sending email to ${to} for event: ${event}`);
-
-        const brevoUrl = 'https://api.brevo.com/v3/smtp/email';
-        const brevoApiKey = process.env.BREVO_API_KEY;
-
-        if (!brevoApiKey) {
-            throw new Error('Server misconfiguration: BREVO_API_KEY is missing');
-        }
-
-        const emailHtml = `
+    const emailHtml = `
       <!DOCTYPE html>
       <html>
       <head>
@@ -91,9 +91,16 @@ export default async function handler(req, res) {
             </table>
           </div>
           
+          <div style="background: rgba(0, 255, 136, 0.1); border: 1px solid rgba(0, 255, 136, 0.3); border-radius: 16px; padding: 20px; margin-bottom: 30px;">
+            <p style="color: #00ff88; margin: 0; font-size: 14px; text-align: center;">
+              📜 <strong>On-Duty Letter</strong> will be sent to your email shortly before the event.
+            </p>
+          </div>
+          
           <div style="background: linear-gradient(135deg, rgba(255, 0, 255, 0.1), rgba(0, 212, 255, 0.1)); border: 1px solid rgba(255, 0, 255, 0.3); border-radius: 16px; padding: 25px; margin-bottom: 30px; text-align: center;">
             <h3 style="color: #ff00ff; margin: 0 0 10px 0;">📅 February 6, 2026</h3>
-            <p style="color: #e0e0e0; margin: 0;">Department of Electrical and Electronics Engineering</p>
+            <p style="color: #e0e0e0; margin: 0;">Chennai Institute of Technology</p>
+            <p style="color: #888; margin: 5px 0 0 0; font-size: 14px;">Department of Electrical and Electronics Engineering</p>
           </div>
           
           <div style="text-align: center; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
@@ -107,47 +114,47 @@ export default async function handler(req, res) {
       </html>
     `;
 
-        const emailData = {
-            sender: {
-                name: "IMPULSE 2026",
-                email: "jaisonbinufrank@gmail.com"
-            },
-            to: [{ email: to, name: name }],
-            subject: `Registration Confirmed - ${event} | IMPULSE 2026`,
-            htmlContent: emailHtml
-        };
+    const emailData = {
+      sender: {
+        name: "IMPULSE 2026",
+        email: "jaisonbinufrank@gmail.com"
+      },
+      to: [{ email: to, name: name }],
+      subject: `Registration Confirmed - ${event} | IMPULSE 2026`,
+      htmlContent: emailHtml
+    };
 
-        const response = await fetch(brevoUrl, {
-            method: 'POST',
-            headers: {
-                'accept': 'application/json',
-                'api-key': brevoApiKey,
-                'content-type': 'application/json'
-            },
-            body: JSON.stringify(emailData)
-        });
+    const response = await fetch(brevoUrl, {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': brevoApiKey,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify(emailData)
+    });
 
-        const data = await response.json();
+    const data = await response.json();
 
-        if (!response.ok) {
-            throw new Error(data.message || 'Failed to send email via Brevo');
-        }
-
-        console.log(`✅ Email sent successfully! Message ID: ${data.messageId}`);
-
-        return res.status(200).json({
-            success: true,
-            message: 'Email sent successfully',
-            messageId: data.messageId
-        });
-
-    } catch (error) {
-        console.error('❌ Error sending email:', error.message);
-
-        return res.status(500).json({
-            success: false,
-            error: 'Failed to send email',
-            details: error.message
-        });
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to send email via Brevo');
     }
+
+    console.log(`✅ Email sent successfully! Message ID: ${data.messageId}`);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Email sent successfully',
+      messageId: data.messageId
+    });
+
+  } catch (error) {
+    console.error('❌ Error sending email:', error.message);
+
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to send email',
+      details: error.message
+    });
+  }
 }
