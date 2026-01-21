@@ -155,6 +155,67 @@ const PerspectiveGrid = () => (
     </div>
 );
 
+// Countdown Timer Component
+const CountdownTimer = ({ targetDate }) => {
+    const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+    useEffect(() => {
+        const calculateTimeLeft = () => {
+            const now = new Date();
+            const difference = targetDate - now;
+
+            if (difference > 0) {
+                setTimeLeft({
+                    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+                    hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+                    minutes: Math.floor((difference / (1000 * 60)) % 60),
+                    seconds: Math.floor((difference / 1000) % 60)
+                });
+            }
+        };
+
+        calculateTimeLeft();
+        const timer = setInterval(calculateTimeLeft, 1000);
+        return () => clearInterval(timer);
+    }, [targetDate]);
+
+    const TimeUnit = ({ value, label }) => (
+        <div className="flex flex-col items-center">
+            <motion.div
+                key={value}
+                initial={{ scale: 1.1, opacity: 0.8 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="bg-navy-900/80 border border-electric-500/40 rounded-lg px-3 py-2 md:px-5 md:py-3 min-w-[60px] md:min-w-[80px] backdrop-blur-sm shadow-[0_0_15px_rgba(45,212,191,0.2)]"
+            >
+                <span className="text-2xl md:text-4xl font-bold text-electric-400 font-mono">
+                    {String(value).padStart(2, '0')}
+                </span>
+            </motion.div>
+            <span className="text-xs md:text-sm text-gray-400 mt-1 uppercase tracking-wider">{label}</span>
+        </div>
+    );
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 3.2, duration: 0.8 }}
+            className="mt-6 mb-2"
+        >
+            <p className="text-sm text-electric-300/70 mb-3 uppercase tracking-widest">Symposium Starts In</p>
+            <div className="flex items-center justify-center gap-2 md:gap-4">
+                <TimeUnit value={timeLeft.days} label="Days" />
+                <span className="text-2xl md:text-4xl text-electric-500 font-bold">:</span>
+                <TimeUnit value={timeLeft.hours} label="Hours" />
+                <span className="text-2xl md:text-4xl text-electric-500 font-bold">:</span>
+                <TimeUnit value={timeLeft.minutes} label="Mins" />
+                <span className="text-2xl md:text-4xl text-electric-500 font-bold">:</span>
+                <TimeUnit value={timeLeft.seconds} label="Secs" />
+            </div>
+        </motion.div>
+    );
+};
+
 const Hero = () => {
     const [bolts, setBolts] = useState([]);
     const [introComplete, setIntroComplete] = useState(false);
@@ -392,6 +453,9 @@ const Hero = () => {
                 >
                     Across Every Frequency
                 </motion.h2>
+
+                {/* Countdown Timer */}
+                <CountdownTimer targetDate={new Date('2026-02-06T00:00:00')} />
 
                 <motion.p
                     initial={{ opacity: 0, y: 20 }}

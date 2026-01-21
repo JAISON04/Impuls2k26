@@ -87,7 +87,7 @@ const WorkshopDetailsModal = ({ workshop, onClose }) => {
                     <div className="grid grid-cols-2 gap-4 mb-8">
                         <div className="flex items-center gap-2 text-gray-400">
                             <Calendar className="text-electric-400" size={18} />
-                            <span>Feb 2026</span>
+                            <span>Feb 5</span>
                         </div>
                         <div className="flex items-center gap-2 text-gray-400">
                             <Clock className="text-electric-400" size={18} />
@@ -198,7 +198,7 @@ const Workshops = ({ previewMode = false }) => {
         };
 
         fetchWorkshops();
-    }, [previewMode]);
+    }, []); // Empty dependency array - fetch only once on mount
 
     const displayedWorkshops = previewMode ? workshops.slice(0, 3) : workshops;
 
