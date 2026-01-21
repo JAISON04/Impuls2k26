@@ -186,37 +186,38 @@ export const generateODPdf = (data) => {
 
     // Closing
     doc.text('Thanking you,', margin, yPos);
-    yPos += 6;
+    yPos += 5;
     doc.text('Yours faithfully,', margin, yPos);
-    yPos += 18;
+    yPos += 15;
 
     // Signature Block
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
     doc.text('Event Coordinator', margin, yPos);
-    yPos += 5;
+    yPos += 4;
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
     doc.text('IMPULSE 2026', margin, yPos);
-    yPos += 5;
+    yPos += 4;
     doc.text('Department of EEE', margin, yPos);
-    yPos += 5;
+    yPos += 4;
     doc.text('Chennai Institute of Technology', margin, yPos);
 
     // ============ FOOTER ============
-    // Footer accent line - positioned lower to avoid overlap
+    // Fixed footer at bottom of page
+    const footerY = pageHeight - 15;
+
+    // Footer accent line
     doc.setDrawColor(...accentColor);
     doc.setLineWidth(1.5);
-    doc.line(margin, pageHeight - 22, pageWidth - margin, pageHeight - 22);
+    doc.line(margin, footerY - 8, pageWidth - margin, footerY - 8);
 
     // Footer text
     doc.setFont('helvetica', 'italic');
-    doc.setFontSize(8);
-    doc.setTextColor(100, 100, 100);
-    doc.text('This is a computer-generated letter and is valid without signature.', pageWidth / 2, pageHeight - 16, { align: 'center' });
-
     doc.setFontSize(7);
-    doc.text(`Generated on: ${new Date().toLocaleString('en-IN')} | Ref: ${refNumber}`, pageWidth / 2, pageHeight - 11, { align: 'center' });
+    doc.setTextColor(100, 100, 100);
+    doc.text('This is a computer-generated letter and is valid without signature.', pageWidth / 2, footerY - 2, { align: 'center' });
+    doc.text(`Generated on: ${new Date().toLocaleString('en-IN')} | Ref: ${refNumber}`, pageWidth / 2, footerY + 3, { align: 'center' });
 
     // Download
     const safeName = name?.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_') || 'Student';
