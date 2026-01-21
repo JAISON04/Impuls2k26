@@ -204,19 +204,19 @@ export const generateODPdf = (data) => {
     doc.text('Chennai Institute of Technology', margin, yPos);
 
     // ============ FOOTER ============
-    // Footer accent line
+    // Footer accent line - positioned lower to avoid overlap
     doc.setDrawColor(...accentColor);
     doc.setLineWidth(1.5);
-    doc.line(margin, pageHeight - 28, pageWidth - margin, pageHeight - 28);
+    doc.line(margin, pageHeight - 22, pageWidth - margin, pageHeight - 22);
 
     // Footer text
     doc.setFont('helvetica', 'italic');
     doc.setFontSize(8);
     doc.setTextColor(100, 100, 100);
-    doc.text('This is a computer-generated letter and is valid without signature.', pageWidth / 2, pageHeight - 22, { align: 'center' });
+    doc.text('This is a computer-generated letter and is valid without signature.', pageWidth / 2, pageHeight - 16, { align: 'center' });
 
     doc.setFontSize(7);
-    doc.text(`Generated on: ${new Date().toLocaleString('en-IN')} | Ref: ${refNumber}`, pageWidth / 2, pageHeight - 18, { align: 'center' });
+    doc.text(`Generated on: ${new Date().toLocaleString('en-IN')} | Ref: ${refNumber}`, pageWidth / 2, pageHeight - 11, { align: 'center' });
 
     // Download
     const safeName = name?.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_') || 'Student';
