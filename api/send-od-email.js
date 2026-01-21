@@ -24,7 +24,7 @@ export default async function handler(req, res) {
         if (!brevoApiKey) throw new Error('BREVO_API_KEY missing');
 
         const emailData = {
-            sender: { name: "Impulse Team", email: "noreply@citimpulse.com" },
+            sender: { name: "Jaison (Impulse Team)", email: "jaisonbinufrank@gmail.com" },
             to: [{ email: to, name: name }],
             subject: "📜 On-Duty Letter - Impulse 2026",
             htmlContent: `

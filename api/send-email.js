@@ -39,8 +39,8 @@ export default async function handler(req, res) {
 
         const emailData = {
             sender: {
-                name: "Impulse Team",
-                email: "noreply@citimpulse.com"
+                name: "Jaison (Impulse Team)",
+                email: "jaisonbinufrank@gmail.com"
             },
             to: [{ email: to, name: name }],
             subject: "🎉 Registration Confirmed - Impulse 2026",
