@@ -24,3 +24,8 @@ dist-ssr
 *.sw?
 functions/.env
 scripts/serviceAccountKey.json
+
+# Email Server
+email-server/.env
+email-server/node_modules
+.env

@@ -9,6 +9,7 @@ import { EMAIL_CONFIG } from '../emailConfig';
 import Section from './Section';
 import { useAuth } from '../context/AuthContext';
 import { loadRazorpay, RAZORPAY_CONFIG } from '../config/razorpay';
+import { sendConfirmationEmail } from '../utils/externalEmailService';
 
 const Register = () => {
     const location = useLocation();
@@ -246,19 +247,12 @@ const Register = () => {
             // 2. Start Background Processes (Fire & Forget for UI speed)
             const dbPromise = setDoc(newRegRef, registrationData);
 
-            // 2b. Send Email
-            const sendEmailFn = httpsCallable(functions, 'sendRegistrationEmail');
-            const emailPromise = sendEmailFn({
-                email: formData.email,
-                name: formData.name,
-                eventName: eventName,
-                paymentId: paymentId || 'N/A',
-                amount: totalPrice,
-                teamCount: teamCount,
-                teamName: formData.teamName || 'N/A', // Add teamName to email
-                teamMembers: teamMembers.map(m => m.name),
-                refId: newRegId
-            });
+            // 2b. Send Email (Using External Backend to bypass Firebase Spark limits)
+            const emailPromise = sendConfirmationEmail(
+                formData.email,
+                formData.name,
+                eventName
+            );
 
             // 2c. Link Event to User Profile
             const userRef = doc(db, 'users', currentUser.uid);
