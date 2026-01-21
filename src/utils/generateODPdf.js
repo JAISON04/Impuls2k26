@@ -5,285 +5,238 @@ import { jsPDF } from 'jspdf';
  * @param {Object} data - Registration data
  */
 export const generateODPdf = (data) => {
-    const { name, college, year, eventName, refId } = data;
+    const { name, college, year, eventName, refId, registeredAt } = data;
 
-    const doc = new jsPDF('p', 'mm', 'a4');
-
+    const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 25;
     let yPos = 25;
 
     // Colors
-    const primaryColor = [0, 51, 102];     // Dark Blue
-    const accentColor = [45, 212, 191];    // Teal
+    const primaryColor = [0, 51, 102]; // Dark Blue
+    const accentColor = [45, 212, 191]; // Teal
 
-    /* ===================== OUTER BORDER ===================== */
+    // ============ OUTER BORDER ============
     doc.setDrawColor(...primaryColor);
     doc.setLineWidth(1.5);
     doc.rect(12, 12, pageWidth - 24, pageHeight - 24);
 
+    // Inner decorative border
     doc.setLineWidth(0.3);
-    doc.setDrawColor(160, 160, 160);
+    doc.setDrawColor(150, 150, 150);
     doc.rect(15, 15, pageWidth - 30, pageHeight - 30);
 
-    /* ===================== HEADER ===================== */
+    // ============ HEADER SECTION ============
     yPos = 28;
 
+    // Institution Name
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(16);
     doc.setTextColor(...primaryColor);
-    doc.text(
-        'CHENNAI INSTITUTE OF TECHNOLOGY',
-        pageWidth / 2,
-        yPos,
-        { align: 'center' }
-    );
-
+    doc.text('CHENNAI INSTITUTE OF TECHNOLOGY', pageWidth / 2, yPos, { align: 'center' });
     yPos += 5;
+
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(90, 90, 90);
-    doc.text(
-        'An Autonomous Institution | Affiliated to Anna University',
-        pageWidth / 2,
-        yPos,
-        { align: 'center' }
-    );
-
+    doc.setTextColor(80, 80, 80);
+    doc.text('An Autonomous Institution | Affiliated to Anna University', pageWidth / 2, yPos, { align: 'center' });
     yPos += 4;
-    doc.text(
-        'Sarathy Nagar, Kundrathur, Chennai - 600069',
-        pageWidth / 2,
-        yPos,
-        { align: 'center' }
-    );
-
-    /* ===================== DEPARTMENT BAR ===================== */
+    doc.text('Sarathy Nagar, Kundrathur, Chennai - 600069', pageWidth / 2, yPos, { align: 'center' });
     yPos += 7;
-    doc.setFillColor(...primaryColor);
-    doc.rect(margin, yPos, pageWidth - margin * 2, 9, 'F');
 
+    // Department Header Bar
+    doc.setFillColor(...primaryColor);
+    doc.rect(margin, yPos, pageWidth - 2 * margin, 9, 'F');
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
     doc.setTextColor(255, 255, 255);
-    doc.text(
-        'DEPARTMENT OF ELECTRICAL AND ELECTRONICS ENGINEERING',
-        pageWidth / 2,
-        yPos + 6.5,
-        { align: 'center' }
-    );
+    doc.text('DEPARTMENT OF ELECTRICAL AND ELECTRONICS ENGINEERING', pageWidth / 2, yPos + 6.5, { align: 'center' });
+    yPos += 12;
 
-    /* ===================== EVENT BANNER ===================== */
-    yPos += 13;
-    doc.setFillColor(...accentColor);
-    doc.rect(margin + 35, yPos, pageWidth - margin * 2 - 70, 10, 'F');
-
-    doc.setFontSize(12);
+    // Event Banner
+    doc.setFillColor(45, 212, 191);
+    doc.rect(margin + 35, yPos, pageWidth - 2 * margin - 70, 10, 'F');
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...primaryColor);
+    doc.setFontSize(12);
+    doc.setTextColor(0, 51, 102);
     doc.text('IMPULSE 2026', pageWidth / 2, yPos + 7, { align: 'center' });
+    yPos += 12;
 
-    yPos += 13;
     doc.setFontSize(9);
+    doc.setTextColor(80, 80, 80);
     doc.setFont('helvetica', 'italic');
-    doc.setTextColor(90, 90, 90);
-    doc.text(
-        'National Level Technical Symposium | February 6, 2026',
-        pageWidth / 2,
-        yPos,
-        { align: 'center' }
-    );
+    doc.text('National Level Technical Symposium | February 6, 2026', pageWidth / 2, yPos, { align: 'center' });
+    yPos += 8;
 
-    /* ===================== SEPARATOR ===================== */
-    yPos += 6;
+    // Horizontal separator
     doc.setDrawColor(200, 200, 200);
     doc.setLineWidth(0.3);
     doc.line(margin, yPos, pageWidth - margin, yPos);
-
-    /* ===================== DATE & REF ===================== */
     yPos += 8;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
+
+    // ============ LETTER CONTENT ============
     doc.setTextColor(0, 0, 0);
 
-    const currentDate = new Date().toLocaleDateString('en-IN', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-    });
+    // Date and Reference - properly aligned
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    const currentDate = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+    doc.text(`Date: ${currentDate}`, margin, yPos);
 
     const refNumber = `IMPULSE/OD/${refId?.slice(-6).toUpperCase() || '000000'}`;
-
-    doc.text(`Date: ${currentDate}`, margin, yPos);
     doc.text(`Ref: ${refNumber}`, pageWidth - margin, yPos, { align: 'right' });
-
-    /* ===================== ADDRESS ===================== */
     yPos += 12;
-    doc.text('To,', margin, yPos);
 
+    // Addressee Section
+    doc.setFont('helvetica', 'normal');
+    doc.text('To,', margin, yPos);
     yPos += 6;
     doc.setFont('helvetica', 'bold');
     doc.text('The Principal / Head of the Department,', margin, yPos);
-
     yPos += 6;
     doc.setFont('helvetica', 'normal');
-    const collegeLines = doc.splitTextToSize(
-        college || '[College Name]',
-        pageWidth - margin * 2
-    );
+    const collegeName = college || '[College Name]';
+    const collegeLines = doc.splitTextToSize(collegeName, pageWidth - 2 * margin);
     doc.text(collegeLines, margin, yPos);
-    yPos += collegeLines.length * 5 + 6;
+    yPos += collegeLines.length * 5 + 8;
 
-    /* ===================== SUBJECT ===================== */
+    // Subject Line
     doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
     doc.text('Subject:', margin, yPos);
     doc.setFont('helvetica', 'normal');
-    doc.text(
-        ' On-Duty Letter for Participation in IMPULSE 2026',
-        margin + 22,
-        yPos
-    );
-
-    /* ===================== BODY ===================== */
+    doc.text(' On-Duty Letter for Participation in IMPULSE 2026', margin + doc.getTextWidth('Subject: '), yPos);
     yPos += 10;
+
+    // Salutation
+    doc.setFont('helvetica', 'normal');
     doc.text('Respected Sir/Madam,', margin, yPos);
+    yPos += 10;
 
-    yPos += 8;
-    const para1 =
-        'This is to certify that the following student from your esteemed institution has registered and participated in IMPULSE 2026, a National Level Technical Symposium organized by the Department of Electrical and Electronics Engineering, Chennai Institute of Technology.';
-    const p1 = doc.splitTextToSize(para1, pageWidth - margin * 2);
-    doc.text(p1, margin, yPos);
-    yPos += p1.length * 5 + 8;
+    // Body Paragraph 1
+    doc.setFontSize(10);
+    const para1 = `This is to certify that the following student from your esteemed institution has registered and participated in IMPULSE 2026, a National Level Technical Symposium organized by the Department of Electrical and Electronics Engineering, Chennai Institute of Technology.`;
+    const splitPara1 = doc.splitTextToSize(para1, pageWidth - 2 * margin);
+    doc.text(splitPara1, margin, yPos);
+    yPos += splitPara1.length * 5 + 10;
 
-    /* ===================== PARTICIPANT DETAILS BOX ===================== */
-    const boxStartY = yPos;
-    const boxHeight = 42;
-
+    // ============ STUDENT DETAILS BOX ============
+    const boxHeight = 38;
     doc.setDrawColor(...primaryColor);
     doc.setLineWidth(0.5);
     doc.setFillColor(248, 250, 252);
-    doc.roundedRect(
-        margin,
-        boxStartY,
-        pageWidth - margin * 2,
-        boxHeight,
-        2,
-        2,
-        'FD'
-    );
+    doc.roundedRect(margin, yPos, pageWidth - 2 * margin, boxHeight, 2, 2, 'FD');
 
+    // Box Header
+    yPos += 7;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
     doc.setTextColor(...primaryColor);
-    doc.text(
-        'PARTICIPANT DETAILS',
-        pageWidth / 2,
-        boxStartY + 9,
-        { align: 'center' }
-    );
+    doc.text('PARTICIPANT DETAILS', pageWidth / 2, yPos, { align: 'center' });
+    yPos += 8;
 
-    doc.setFontSize(9);
+    // Details in two columns with proper alignment
     doc.setTextColor(0, 0, 0);
+    doc.setFontSize(9);
 
-    const leftX = margin + 10;
-    const rightX = pageWidth / 2 + 10;
-    const labelGap = 28;
+    const leftColX = margin + 8;
+    const rightColX = pageWidth / 2 + 10;
+    const leftLabelWidth = 28;   // For "Name:" and "Event:"
+    const rightLabelWidth = 22;  // For "Year:" and "College:" (shorter labels)
 
-    const row1 = boxStartY + 18;
-    const row2 = boxStartY + 26;
+    // Row 1
+    doc.setFont('helvetica', 'bold');
+    doc.text('Name:', leftColX, yPos);
+    doc.setFont('helvetica', 'normal');
+    doc.text(name || 'N/A', leftColX + leftLabelWidth, yPos);
 
     doc.setFont('helvetica', 'bold');
-    doc.text('Name:', leftX, row1);
+    doc.text('Year:', rightColX, yPos);
     doc.setFont('helvetica', 'normal');
-    doc.text(name || 'N/A', leftX + labelGap, row1);
+    doc.text(getYearText(year), rightColX + rightLabelWidth, yPos);
+    yPos += 7;
+
+    // Row 2
+    doc.setFont('helvetica', 'bold');
+    doc.text('Event:', leftColX, yPos);
+    doc.setFont('helvetica', 'normal');
+    doc.text(eventName || 'N/A', leftColX + leftLabelWidth, yPos);
 
     doc.setFont('helvetica', 'bold');
-    doc.text('Year:', rightX, row1);
+    doc.text('College:', rightColX, yPos);
     doc.setFont('helvetica', 'normal');
-    doc.text(getYearText(year), rightX + labelGap, row1);
+    const shortCollege = college ? (college.length > 25 ? college.substring(0, 22) + '...' : college) : 'N/A';
+    doc.text(shortCollege, rightColX + rightLabelWidth, yPos);
 
-    doc.setFont('helvetica', 'bold');
-    doc.text('Event:', leftX, row2);
-    doc.setFont('helvetica', 'normal');
-    doc.text(eventName || 'N/A', leftX + labelGap, row2);
+    yPos += boxHeight - 22 + 10;
 
-    doc.setFont('helvetica', 'bold');
-    doc.text('College:', rightX, row2);
-    doc.setFont('helvetica', 'normal');
-    const collegeWrapped = doc.splitTextToSize(
-        college || 'N/A',
-        pageWidth / 2 - margin - labelGap - 10
-    );
-    doc.text(collegeWrapped, rightX + labelGap, row2);
+    // Body Paragraph 2
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    const para2 = `We kindly request you to grant the necessary On-Duty permission to the above-mentioned student for attending this symposium. The student's participation and presence has been verified and confirmed.`;
+    const splitPara2 = doc.splitTextToSize(para2, pageWidth - 2 * margin);
+    doc.text(splitPara2, margin, yPos);
+    yPos += splitPara2.length * 5 + 6;
 
-    yPos = boxStartY + boxHeight + 10;
+    // Body Paragraph 3
+    const para3 = `We appreciate your cooperation and support in encouraging students to participate in such technical events that enhance their knowledge and skills.`;
+    const splitPara3 = doc.splitTextToSize(para3, pageWidth - 2 * margin);
+    doc.text(splitPara3, margin, yPos);
+    yPos += splitPara3.length * 5 + 12;
 
-    /* ===================== CLOSING ===================== */
-    const para2 =
-        'We kindly request you to grant the necessary On-Duty permission to the above-mentioned student for attending this symposium. The student’s participation and presence has been verified and confirmed.';
-    const p2 = doc.splitTextToSize(para2, pageWidth - margin * 2);
-    doc.text(p2, margin, yPos);
-    yPos += p2.length * 5 + 6;
-
-    const para3 =
-        'We appreciate your cooperation and support in encouraging students to participate in such technical events that enhance their knowledge and skills.';
-    const p3 = doc.splitTextToSize(para3, pageWidth - margin * 2);
-    doc.text(p3, margin, yPos);
-    yPos += p3.length * 5 + 10;
-
+    // Closing
     doc.text('Thanking you,', margin, yPos);
     yPos += 5;
     doc.text('Yours faithfully,', margin, yPos);
-    yPos += 12;
+    yPos += 15;
 
+    // Signature Block
     doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
     doc.text('Event Coordinator', margin, yPos);
-    yPos += 5;
-
+    yPos += 4;
     doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
     doc.text('IMPULSE 2026', margin, yPos);
     yPos += 4;
     doc.text('Department of EEE', margin, yPos);
     yPos += 4;
     doc.text('Chennai Institute of Technology', margin, yPos);
 
-    /* ===================== FOOTER ===================== */
-    const footerLineY = pageHeight - 25;
+    // ============ FOOTER ============
+    // Footer accent line AFTER signature block
+    const footerLineY = yPos + 12;
     doc.setDrawColor(...accentColor);
     doc.setLineWidth(1.5);
     doc.line(margin, footerLineY, pageWidth - margin, footerLineY);
 
+    // Footer text at bottom
     doc.setFont('helvetica', 'italic');
     doc.setFontSize(7);
     doc.setTextColor(100, 100, 100);
-    doc.text(
-        'This is a computer-generated letter and is valid without signature.',
-        pageWidth / 2,
-        pageHeight - 14,
-        { align: 'center' }
-    );
-    doc.text(
-        `Generated on: ${new Date().toLocaleString('en-IN')} | Ref: ${refNumber}`,
-        pageWidth / 2,
-        pageHeight - 9,
-        { align: 'center' }
-    );
+    doc.text('This is a computer-generated letter and is valid without signature.', pageWidth / 2, pageHeight - 12, { align: 'center' });
+    doc.text(`Generated on: ${new Date().toLocaleString('en-IN')} | Ref: ${refNumber}`, pageWidth / 2, pageHeight - 7, { align: 'center' });
 
-    /* ===================== SAVE ===================== */
-    const safeName = name?.replace(/\s+/g, '_') || 'Student';
-    const safeEvent = eventName?.replace(/\s+/g, '_') || 'Event';
+    // Download
+    const safeName = name?.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_') || 'Student';
+    const safeEvent = eventName?.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_') || 'Event';
+    // Return Data or Save
+    if (data.returnBase64) {
+        return doc.output('datauristring').split(',')[1]; // Return raw base64
+    }
+
     doc.save(`OD_Letter_${safeName}_${safeEvent}.pdf`);
 };
 
 const getYearText = (year) => {
-    const map = {
+    const yearMap = {
         '1': '1st Year',
         '2': '2nd Year',
         '3': '3rd Year',
-        '4': '4th Year',
+        '4': '4th Year'
     };
-    return map[year] || year || 'N/A';
+    return yearMap[year] || year || 'N/A';
 };
 
 export default generateODPdf;
