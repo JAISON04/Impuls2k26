@@ -17,7 +17,7 @@ export default async function handler(req, res) {
         });
     }
 
-    const { to, name, event, qrCode } = req.body;
+    const { to, name, event, college, year, amount, transactionId } = req.body;
 
     // Basic Validation
     if (!to || !name || !event) {
@@ -37,52 +37,84 @@ export default async function handler(req, res) {
             throw new Error('Server misconfiguration: BREVO_API_KEY is missing');
         }
 
+        const emailHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #0a0a0f; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+          <div style="text-align: center; margin-bottom: 40px;">
+            <div style="display: inline-block; background: linear-gradient(135deg, #00d4ff, #ff00ff); padding: 15px 30px; border-radius: 50px;">
+              <h1 style="margin: 0; color: #0a0a0f; font-size: 28px; font-weight: bold;">⚡ IMPULSE 2026</h1>
+            </div>
+            <p style="color: #888; margin-top: 15px; font-size: 14px;">EEE Department Symposium</p>
+          </div>
+          
+          <div style="background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(255, 0, 255, 0.1)); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 16px; padding: 30px; margin-bottom: 30px;">
+            <h2 style="color: #00d4ff; margin: 0 0 15px 0; font-size: 24px;">🎉 Registration Successful!</h2>
+            <p style="color: #e0e0e0; margin: 0; line-height: 1.6;">
+              Dear <strong style="color: #00d4ff;">${name}</strong>,<br><br>
+              Your registration for <strong style="color: #ff00ff;">${event}</strong> has been confirmed. We're excited to have you join us!
+            </p>
+          </div>
+          
+          <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 25px; margin-bottom: 30px;">
+            <h3 style="color: #00d4ff; margin: 0 0 20px 0; font-size: 18px;">📋 Registration Details</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 12px 0; color: #888; border-bottom: 1px solid rgba(255,255,255,0.1);">Event</td>
+                <td style="padding: 12px 0; color: #e0e0e0; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: bold;">${event}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px 0; color: #888; border-bottom: 1px solid rgba(255,255,255,0.1);">Name</td>
+                <td style="padding: 12px 0; color: #e0e0e0; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.1);">${name}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px 0; color: #888; border-bottom: 1px solid rgba(255,255,255,0.1);">College</td>
+                <td style="padding: 12px 0; color: #e0e0e0; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.1);">${college || 'N/A'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px 0; color: #888; border-bottom: 1px solid rgba(255,255,255,0.1);">Year</td>
+                <td style="padding: 12px 0; color: #e0e0e0; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.1);">${year || 'N/A'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px 0; color: #888; border-bottom: 1px solid rgba(255,255,255,0.1);">Amount Paid</td>
+                <td style="padding: 12px 0; color: #00ff88; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: bold;">₹${amount || 0}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px 0; color: #888;">Transaction ID</td>
+                <td style="padding: 12px 0; color: #e0e0e0; text-align: right; font-family: monospace; font-size: 12px;">${transactionId || 'N/A'}</td>
+              </tr>
+            </table>
+          </div>
+          
+          <div style="background: linear-gradient(135deg, rgba(255, 0, 255, 0.1), rgba(0, 212, 255, 0.1)); border: 1px solid rgba(255, 0, 255, 0.3); border-radius: 16px; padding: 25px; margin-bottom: 30px; text-align: center;">
+            <h3 style="color: #ff00ff; margin: 0 0 10px 0;">📅 February 6, 2026</h3>
+            <p style="color: #e0e0e0; margin: 0;">Department of Electrical and Electronics Engineering</p>
+          </div>
+          
+          <div style="text-align: center; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <p style="color: #666; font-size: 12px; margin: 0;">
+              For any queries, contact us at impulse2026@citimpulse.com<br><br>
+              © 2026 IMPULSE - EEE Department Symposium
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
         const emailData = {
             sender: {
-                name: "Jaison (Impulse Team)",
+                name: "IMPULSE 2026",
                 email: "jaisonbinufrank@gmail.com"
             },
             to: [{ email: to, name: name }],
-            subject: "🎉 Registration Confirmed - Impulse 2026",
-            htmlContent: `
-                <!DOCTYPE html>
-                <html>
-                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-                    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                        <h1 style="margin: 0;">Registration Confirmed!</h1>
-                        <p style="font-size: 18px; margin-top: 10px;">Impulse 2026</p>
-                    </div>
-                    
-                    <div style="background: #f8fafc; padding: 30px; border: 1px solid #e2e8f0; border-radius: 0 0 10px 10px;">
-                        <p>Hello <strong>${name}</strong>,</p>
-                        
-                        <p>Your registration for <strong>${event}</strong> has been successfully confirmed.</p>
-                        
-                        <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid #3b82f6; margin: 20px 0;">
-                            <p style="margin: 5px 0;"><strong>Participant:</strong> ${name}</p>
-                            <p style="margin: 5px 0;"><strong>Event:</strong> ${event}</p>
-                            <p style="margin: 5px 0;"><strong>Status:</strong> ✅ Confirmed</p>
-                        </div>
-
-                        ${qrCode ? `
-                        <div style="text-align: center; margin: 20px 0;">
-                            <p><strong>Your Entry QR Code:</strong></p>
-                            <img src="${qrCode}" alt="QR Code" style="width: 200px; height: 200px; border: 5px solid white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);" />
-                        </div>
-                        ` : ''}
-
-                        <p>Please show this email or your QR code at the registration desk on the day of the event.</p>
-                        
-                        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 30px 0;">
-                        
-                        <p style="font-size: 14px; color: #64748b; text-align: center;">
-                            Chennai Institute of Technology<br>
-                            Sarathy Nagar, Kundrathur, Chennai - 600069
-                        </p>
-                    </div>
-                </body>
-                </html>
-            `
+            subject: `Registration Confirmed - ${event} | IMPULSE 2026`,
+            htmlContent: emailHtml
         };
 
         const response = await fetch(brevoUrl, {

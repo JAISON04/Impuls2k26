@@ -11,10 +11,13 @@ const CLIENT_KEY = "impulse2026secure";
  * @param {string} userEmail - Recipient email
  * @param {string} userName - Participant name
  * @param {string} eventName - Name of the event/workshop
- * @param {string} qrCode - (Optional) QR Code URL
+ * @param {string} college - College name
+ * @param {string} year - Year of study
+ * @param {number} amount - Amount paid
+ * @param {string} transactionId - Payment transaction ID
  * @returns {Promise<Object>} Response data validation
  */
-export const sendConfirmationEmail = async (userEmail, userName, eventName, qrCode = null) => {
+export const sendConfirmationEmail = async (userEmail, userName, eventName, college, year, amount, transactionId) => {
     try {
         console.log(`📨 Sending email to ${userEmail} via external backend...`);
 
@@ -28,7 +31,10 @@ export const sendConfirmationEmail = async (userEmail, userName, eventName, qrCo
                 to: userEmail,
                 name: userName,
                 event: eventName,
-                qrCode: qrCode
+                college: college,
+                year: year,
+                amount: amount,
+                transactionId: transactionId
             })
         });
 

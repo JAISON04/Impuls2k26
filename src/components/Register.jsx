@@ -251,7 +251,11 @@ const Register = () => {
             const emailPromise = sendConfirmationEmail(
                 formData.email,
                 formData.name,
-                eventName
+                eventName,
+                formData.college,
+                formData.year,
+                totalPrice,
+                paymentId || 'N/A'
             );
 
             // 2c. Link Event to User Profile
