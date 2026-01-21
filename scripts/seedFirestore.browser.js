@@ -400,6 +400,14 @@
     }
     console.log(`   Deleted ${existingEvents.docs.length} existing events`);
 
+    // Delete existing workshops
+    console.log('🗑️ Clearing existing workshops...');
+    const existingWorkshops = await getDocs(collection(db, 'workshops'));
+    for (const docSnapshot of existingWorkshops.docs) {
+        await deleteDoc(doc(db, 'workshops', docSnapshot.id));
+    }
+    console.log(`   Deleted ${existingWorkshops.docs.length} existing workshops`);
+
     let count = 0;
 
     // Seed Technical Events
