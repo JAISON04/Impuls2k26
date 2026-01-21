@@ -1,7 +1,7 @@
 // Service for sending emails via Vercel Serverless Function
 
 // Use relative path for Vercel deployment (same domain)
-const EMAIL_API_URL = "";
+const EMAIL_API_URL = "/api";
 
 // Client key for API authentication (must match Vercel env variable)
 const CLIENT_KEY = "impulse2026secure";
