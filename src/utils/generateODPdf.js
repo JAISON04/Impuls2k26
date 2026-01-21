@@ -99,7 +99,7 @@ export const generateODPdf = (data) => {
     const collegeName = college || '[College Name]';
     const collegeLines = doc.splitTextToSize(collegeName, pageWidth - 2 * margin);
     doc.text(collegeLines, margin, yPos);
-    yPos += collegeLines.length * 5 + 8;
+    yPos += collegeLines.length * 5 + 4;
 
     // Subject Line
     doc.setFont('helvetica', 'bold');
