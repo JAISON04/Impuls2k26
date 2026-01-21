@@ -12,7 +12,7 @@ import photo from '../assets/images/imagephotpo.png';
 import posterDesign from '../assets/images/imageposter.png';
 import aiVideo from '../assets/images/imagevideo.png';
 import lastLogin from '../assets/images/imageentre.png';
-import electrolink from '../assets/images/imageiot.png';
+import electrolink from '../assets/images/electrolink.png';
 import blackout from '../assets/images/blackout_files.jpg';
 import iot from '../assets/images/imageiot.png';
 import ev from '../assets/images/imageev.png';

@@ -10,7 +10,7 @@ import photo from '../assets/images/imagephotpo.png'; // For Photography
 import posterDesign from '../assets/images/imageposter.png'; // Reusing for Poster Design
 import aiVideo from '../assets/images/imagevideo.png'; // Reusing for AI Video
 import lastLogin from '../assets/images/imageentre.png'; // Placeholder
-import electrolink from '../assets/images/imageiot.png'; // Placeholder
+import electrolink from '../assets/images/electrolink.png';
 import blackout from '../assets/images/blackout_files.jpg'; // Updated image
 
 // Import Workshop Images
