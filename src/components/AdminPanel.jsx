@@ -238,6 +238,44 @@ const AdminPanel = () => {
         }
     };
 
+    const handleSendODEmail = async (student) => {
+        if (!confirm(`Send OD Letter via email to ${student.name}?`)) return;
+
+        setSendingOD(student.id);
+        try {
+            // 1. Generate PDF Base64
+            // Pass plain object with returnBase64: true
+            const pdfBase64 = generateODPdf({ ...student, returnBase64: true });
+
+            // 2. Call API
+            // Use relative path '/api/send-od-email' for Vercel
+            const response = await fetch('/api/send-od-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': 'impulse2026secure' // Matches CLIENT_KEY in api/send-od-email.js
+                },
+                body: JSON.stringify({
+                    to: student.email,
+                    name: student.name,
+                    event: student.eventName,
+                    pdfBase64: pdfBase64
+                })
+            });
+
+            const result = await response.json();
+            if (!result.success) throw new Error(result.error);
+
+            alert(`✅ OD Email sent to ${student.email}`);
+
+        } catch (err) {
+            console.error("Error sending OD email:", err);
+            alert(`❌ Failed to send email: ${err.message}`);
+        } finally {
+            setSendingOD(null);
+        }
+    };
+
     const handleSeedDB = async () => {
         if (!confirm("This will overwrite existing events/workshops in DB. Continue?")) return;
         setLoading(true);
@@ -699,9 +737,19 @@ const AdminPanel = () => {
                                                             onClick={() => handleGenerateOD(reg)}
                                                             disabled={sendingOD === reg.id}
                                                             className="p-2 rounded-lg bg-navy-800 hover:bg-navy-700 text-gray-300 hover:text-white border border-white/10 hover:border-green-500/50 transition-all hover:shadow-[0_0_15px_rgba(34,197,94,0.3)] hover:scale-110 disabled:opacity-50"
-                                                            title={reg.odGenerated ? "Re-enable OD" : "Enable OD Download"}
+                                                            title={reg.odGenerated ? "Re-enable OD Download" : "Enable OD Download"}
                                                         >
-                                                            {sendingOD === reg.id ? <Loader2 className="animate-spin" size={16} /> : <Download size={16} />}
+                                                            <Download size={16} />
+                                                        </button>
+
+                                                        {/* Send OD Mail */}
+                                                        <button
+                                                            onClick={() => handleSendODEmail(reg)}
+                                                            disabled={sendingOD === reg.id}
+                                                            className="p-2 rounded-lg bg-navy-800 hover:bg-navy-700 text-gray-300 hover:text-white border border-white/10 hover:border-cyan-500/50 transition-all hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:scale-110 disabled:opacity-50"
+                                                            title="Send OD via Email"
+                                                        >
+                                                            {sendingOD === reg.id ? <Loader2 className="animate-spin" size={16} /> : <FileText size={16} />}
                                                         </button>
 
                                                         {/* Email */}

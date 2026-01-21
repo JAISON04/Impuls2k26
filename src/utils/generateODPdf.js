@@ -221,6 +221,11 @@ export const generateODPdf = (data) => {
     // Download
     const safeName = name?.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_') || 'Student';
     const safeEvent = eventName?.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_') || 'Event';
+    // Return Data or Save
+    if (data.returnBase64) {
+        return doc.output('datauristring').split(',')[1]; // Return raw base64
+    }
+
     doc.save(`OD_Letter_${safeName}_${safeEvent}.pdf`);
 };
 
