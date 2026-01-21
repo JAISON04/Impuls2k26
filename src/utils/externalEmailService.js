@@ -1,12 +1,10 @@
-// Service for sending emails via External Node.js Backend (Render)
-// Bypasses Firebase Spark Plan limitations
+// Service for sending emails via Vercel Serverless Function
 
-// TODO: Replace this with your actual Render URL after deployment
-const EMAIL_API_URL = "http://localhost:3000"; // Use localhost for testing, then Render URL
-// const EMAIL_API_URL = "https://impulse-email-backend.onrender.com";
+// Use relative path for Vercel deployment (same domain)
+const EMAIL_API_URL = "";
 
-// TODO: Replace with the key you set in your backend .env
-const CLIENT_KEY = "my-secure-client-key-123";
+// Client key for API authentication (must match Vercel env variable)
+const CLIENT_KEY = "impulse2026secure";
 
 /**
  * Send registration confirmation email
