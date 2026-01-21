@@ -35,15 +35,15 @@ export const generateODPdf = (data) => {
     doc.setFontSize(16);
     doc.setTextColor(...primaryColor);
     doc.text('CHENNAI INSTITUTE OF TECHNOLOGY', pageWidth / 2, yPos, { align: 'center' });
-    yPos += 7;
+    yPos += 5;
 
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(80, 80, 80);
     doc.text('An Autonomous Institution | Affiliated to Anna University', pageWidth / 2, yPos, { align: 'center' });
-    yPos += 5;
+    yPos += 4;
     doc.text('Sarathy Nagar, Kundrathur, Chennai - 600069', pageWidth / 2, yPos, { align: 'center' });
-    yPos += 10;
+    yPos += 7;
 
     // Department Header Bar
     doc.setFillColor(...primaryColor);
@@ -52,7 +52,7 @@ export const generateODPdf = (data) => {
     doc.setFontSize(10);
     doc.setTextColor(255, 255, 255);
     doc.text('DEPARTMENT OF ELECTRICAL AND ELECTRONICS ENGINEERING', pageWidth / 2, yPos + 6.5, { align: 'center' });
-    yPos += 16;
+    yPos += 12;
 
     // Event Banner
     doc.setFillColor(45, 212, 191);
@@ -61,19 +61,19 @@ export const generateODPdf = (data) => {
     doc.setFontSize(12);
     doc.setTextColor(0, 51, 102);
     doc.text('IMPULSE 2026', pageWidth / 2, yPos + 7, { align: 'center' });
-    yPos += 14;
+    yPos += 12;
 
     doc.setFontSize(9);
     doc.setTextColor(80, 80, 80);
     doc.setFont('helvetica', 'italic');
     doc.text('National Level Technical Symposium | February 6, 2026', pageWidth / 2, yPos, { align: 'center' });
-    yPos += 12;
+    yPos += 8;
 
     // Horizontal separator
     doc.setDrawColor(200, 200, 200);
     doc.setLineWidth(0.3);
     doc.line(margin, yPos, pageWidth - margin, yPos);
-    yPos += 10;
+    yPos += 8;
 
     // ============ LETTER CONTENT ============
     doc.setTextColor(0, 0, 0);
@@ -204,20 +204,18 @@ export const generateODPdf = (data) => {
     doc.text('Chennai Institute of Technology', margin, yPos);
 
     // ============ FOOTER ============
-    // Fixed footer at bottom of page
-    const footerY = pageHeight - 15;
-
-    // Footer accent line
+    // Footer accent line AFTER signature block
+    const footerLineY = yPos + 12;
     doc.setDrawColor(...accentColor);
     doc.setLineWidth(1.5);
-    doc.line(margin, footerY - 8, pageWidth - margin, footerY - 8);
+    doc.line(margin, footerLineY, pageWidth - margin, footerLineY);
 
-    // Footer text
+    // Footer text at bottom
     doc.setFont('helvetica', 'italic');
     doc.setFontSize(7);
     doc.setTextColor(100, 100, 100);
-    doc.text('This is a computer-generated letter and is valid without signature.', pageWidth / 2, footerY - 2, { align: 'center' });
-    doc.text(`Generated on: ${new Date().toLocaleString('en-IN')} | Ref: ${refNumber}`, pageWidth / 2, footerY + 3, { align: 'center' });
+    doc.text('This is a computer-generated letter and is valid without signature.', pageWidth / 2, pageHeight - 12, { align: 'center' });
+    doc.text(`Generated on: ${new Date().toLocaleString('en-IN')} | Ref: ${refNumber}`, pageWidth / 2, pageHeight - 7, { align: 'center' });
 
     // Download
     const safeName = name?.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '_') || 'Student';
