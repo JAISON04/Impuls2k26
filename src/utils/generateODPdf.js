@@ -66,7 +66,7 @@ export const generateODPdf = (data) => {
     doc.setFontSize(9);
     doc.setTextColor(80, 80, 80);
     doc.setFont('helvetica', 'italic');
-    doc.text('National Level Technical Symposium | February 5, 2025', pageWidth / 2, yPos + 5, { align: 'center' });
+    doc.text('National Level Technical Symposium | February 5, 2026', pageWidth / 2, yPos + 5, { align: 'center' });
     yPos += 13;
 
     // Horizontal separator

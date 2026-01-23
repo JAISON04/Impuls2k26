@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 
 const Countdown = () => {
-    // Set target date (February 6, 2026)
-    const targetDate = new Date("2026-02-06T09:00:00").getTime();
+    // Set target date (February 5, 2026)
+    const targetDate = new Date("2026-02-05T09:00:00").getTime();
 
     const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 

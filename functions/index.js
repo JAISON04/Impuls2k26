@@ -129,7 +129,7 @@ exports.sendODEmail = onCall({ cors: true }, async (request) => {
         <div class="content">
             <p>This is to certify that <strong>${name}</strong> is a registered participant for <strong>IMPULSE 2026</strong>, a National Level Technical Symposium organized by the Department of Electrical and Electronics Engineering, Chennai Institute of Technology.</p>
             
-            <p>The event is scheduled to be held on <strong>${eventDate || 'March 20, 2026'}</strong>.</p>
+            <p>The event is scheduled to be held on <strong>${eventDate || 'February 5, 2026'}</strong>.</p>
             
             <p>We kindly request you to grant On-Duty (OD) to this student to enable their participation in the event.</p>
         </div>
@@ -153,7 +153,7 @@ exports.sendODEmail = onCall({ cors: true }, async (request) => {
     To: The Principal / HOD, ${college}
     
     This is to certify that ${name} is a registered participant for IMPULSE 2026.
-    The event is scheduled to be held on ${eventDate || 'March 20, 2026'}.
+    The event is scheduled to be held on ${eventDate || 'February 5, 2026'}.
     We kindly request you to grant On-Duty (OD) to this student.
     
     Thank you,

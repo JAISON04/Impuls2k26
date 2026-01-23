@@ -57,7 +57,7 @@ export default async function handler(req, res) {
           </div>
           
           <div style="background: linear-gradient(135deg, rgba(255, 0, 255, 0.1), rgba(0, 212, 255, 0.1)); border: 1px solid rgba(255, 0, 255, 0.3); border-radius: 16px; padding: 25px; margin-bottom: 30px; text-align: center;">
-            <h3 style="color: #ff00ff; margin: 0 0 10px 0;">📅 February 5, 2025</h3>
+            <h3 style="color: #ff00ff; margin: 0 0 10px 0;">📅 February 5, 2026</h3>
             <p style="color: #e0e0e0; margin: 0;">Chennai Institute of Technology</p>
             <p style="color: #888; margin: 5px 0 0 0; font-size: 14px;">Department of Electrical and Electronics Engineering</p>
           </div>

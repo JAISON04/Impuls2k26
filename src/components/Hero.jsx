@@ -455,7 +455,17 @@ const Hero = () => {
                 </motion.h2>
 
                 {/* Countdown Timer */}
-                <CountdownTimer targetDate={new Date('2026-02-06T00:00:00')} />
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 3.1, duration: 0.8 }}
+                    className="mt-6 text-center"
+                >
+                    <h3 className="text-2xl md:text-4xl font-bold text-white mb-2">
+                        📅 <span className="bg-gradient-to-r from-electric-400 to-electric-300 bg-clip-text text-transparent">February 5, 2026</span>
+                    </h3>
+                </motion.div>
+                <CountdownTimer targetDate={new Date('2026-02-05T09:00:00')} />
 
                 <motion.p
                     initial={{ opacity: 0, y: 20 }}
