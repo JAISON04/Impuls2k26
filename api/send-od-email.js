@@ -1,29 +1,29 @@
 export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
-    }
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
-    const apiKey = req.headers['x-api-key'];
-    const validKey = process.env.CLIENT_KEY;
+  const apiKey = req.headers['x-api-key'];
+  const validKey = process.env.CLIENT_KEY;
 
-    if (!apiKey || apiKey !== validKey) {
-        return res.status(403).json({ success: false, error: 'Forbidden' });
-    }
+  if (!apiKey || apiKey !== validKey) {
+    return res.status(403).json({ success: false, error: 'Forbidden' });
+  }
 
-    const { to, name, event, pdfBase64 } = req.body;
+  const { to, name, event, pdfBase64 } = req.body;
 
-    if (!to || !name || !event || !pdfBase64) {
-        return res.status(400).json({ success: false, error: 'Missing required fields' });
-    }
+  if (!to || !name || !event || !pdfBase64) {
+    return res.status(400).json({ success: false, error: 'Missing required fields' });
+  }
 
-    try {
-        console.log(`📨 Sending OD email to ${to}`);
-        const brevoUrl = 'https://api.brevo.com/v3/smtp/email';
-        const brevoApiKey = process.env.BREVO_API_KEY;
+  try {
+    console.log(`📨 Sending OD email to ${to}`);
+    const brevoUrl = 'https://api.brevo.com/v3/smtp/email';
+    const brevoApiKey = process.env.BREVO_API_KEY;
 
-        if (!brevoApiKey) throw new Error('BREVO_API_KEY missing');
+    if (!brevoApiKey) throw new Error('BREVO_API_KEY missing');
 
-        const emailHtml = `
+    const emailHtml = `
       <!DOCTYPE html>
       <html>
       <head>
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
           </div>
           
           <div style="background: linear-gradient(135deg, rgba(255, 0, 255, 0.1), rgba(0, 212, 255, 0.1)); border: 1px solid rgba(255, 0, 255, 0.3); border-radius: 16px; padding: 25px; margin-bottom: 30px; text-align: center;">
-            <h3 style="color: #ff00ff; margin: 0 0 10px 0;">📅 February 6, 2026</h3>
+            <h3 style="color: #ff00ff; margin: 0 0 10px 0;">📅 February 5, 2025</h3>
             <p style="color: #e0e0e0; margin: 0;">Chennai Institute of Technology</p>
             <p style="color: #888; margin: 5px 0 0 0; font-size: 14px;">Department of Electrical and Electronics Engineering</p>
           </div>
@@ -73,37 +73,37 @@ export default async function handler(req, res) {
       </html>
     `;
 
-        const emailData = {
-            sender: { name: "IMPULSE 2026", email: "jaisonbinufrank@gmail.com" },
-            to: [{ email: to, name: name }],
-            subject: `📜 On-Duty Letter - ${event} | IMPULSE 2026`,
-            htmlContent: emailHtml,
-            attachment: [
-                {
-                    content: pdfBase64,
-                    name: `OD_Letter_${name.replace(/\s+/g, '_')}.pdf`
-                }
-            ]
-        };
+    const emailData = {
+      sender: { name: "IMPULSE 2026", email: "jaisonbinufrank@gmail.com" },
+      to: [{ email: to, name: name }],
+      subject: `📜 On-Duty Letter - ${event} | IMPULSE 2026`,
+      htmlContent: emailHtml,
+      attachment: [
+        {
+          content: pdfBase64,
+          name: `OD_Letter_${name.replace(/\s+/g, '_')}.pdf`
+        }
+      ]
+    };
 
-        const response = await fetch(brevoUrl, {
-            method: 'POST',
-            headers: {
-                'accept': 'application/json',
-                'api-key': brevoApiKey,
-                'content-type': 'application/json'
-            },
-            body: JSON.stringify(emailData)
-        });
+    const response = await fetch(brevoUrl, {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': brevoApiKey,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify(emailData)
+    });
 
-        const data = await response.json();
+    const data = await response.json();
 
-        if (!response.ok) throw new Error(data.message || 'Brevo API Error');
+    if (!response.ok) throw new Error(data.message || 'Brevo API Error');
 
-        return res.status(200).json({ success: true, messageId: data.messageId });
+    return res.status(200).json({ success: true, messageId: data.messageId });
 
-    } catch (error) {
-        console.error('OD Email Error:', error);
-        return res.status(500).json({ success: false, error: error.message });
-    }
+  } catch (error) {
+    console.error('OD Email Error:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
 }
