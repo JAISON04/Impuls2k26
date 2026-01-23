@@ -116,7 +116,7 @@ export const generateODPdf = (data) => {
 
     // Body Paragraph 1
     doc.setFontSize(10);
-    const para1 = `This is to certify that the following student from your esteemed institution has registered and participated in IMPULSE 2026, a National Level Technical Symposium organized by the Department of Electrical and Electronics Engineering, Chennai Institute of Technology.`;
+    const para1 = `This is to certify that the following student from your esteemed institution has registered and participated in IMPULSE 2026, a National Level Technical Symposium organized by the Department of Electrical and Electronics Engineering, Chennai Institute of Technology, held on February 5, 2026.`;
     const splitPara1 = doc.splitTextToSize(para1, pageWidth - 2 * margin);
     doc.text(splitPara1, margin, yPos);
     yPos += splitPara1.length * 5 + 10;
