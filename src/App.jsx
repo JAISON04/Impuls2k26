@@ -18,6 +18,8 @@ import DepartmentAchievements from './components/DepartmentAchievements';
 import Coordinators from './components/Coordinators';
 import Footer from './components/Footer';
 import CustomCursor from './components/CustomCursor';
+import TermsAndConditions from './components/TermsAndConditions';
+import PrivacyPolicy from './components/PrivacyPolicy';
 
 // Home Component to group landing page sections
 const Home = () => (
@@ -69,6 +71,8 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/admin-downloads" element={<AdminPanel />} />
+              <Route path="/terms" element={<TermsAndConditions />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
             </Routes>
           </motion.div>
 

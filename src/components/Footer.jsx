@@ -34,12 +34,13 @@ const Footer = () => {
                         <p className="text-gray-600 font-mono text-xs md:text-sm">
                             &copy; {new Date().getFullYear()} IMPULSE | Department of EEE
                         </p>
-                        <p className="text-electric-500/50 text-[10px] mt-1 font-mono tracking-widest">
-                            CHENNAI INSTITUTE OF TECHNOLOGY
-                        </p>
+                        <div className="flex gap-4 justify-center md:justify-end mt-2 text-[10px] text-gray-500 font-mono tracking-widest">
+                            <Link to="/terms" className="hover:text-electric-400 transition-colors">Terms & Conditions</Link>
+                            <span>|</span>
+                            <Link to="/privacy" className="hover:text-electric-400 transition-colors">Privacy Policy</Link>
+                        </div>
                     </div>
                 </div>
-            </div>
         </footer>
     );
 };
