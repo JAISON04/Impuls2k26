@@ -5,13 +5,18 @@ import { jsPDF } from 'jspdf';
  * @param {Object} data - Registration data
  */
 export const generateODPdf = (data) => {
-    const { name, college, year, eventName, refId, registeredAt } = data;
+    const { name, college, year, eventName, refId, registeredAt, teamMembers } = data;
 
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 25;
     let yPos = 25;
+
+    // Parse team members - handle both array of objects and array of strings
+    const parsedTeamMembers = (teamMembers || []).map(m =>
+        typeof m === 'string' ? m : (m?.name || '')
+    ).filter(name => name && name.trim());
 
     // Colors
     const primaryColor = [0, 51, 102]; // Dark Blue
@@ -171,10 +176,28 @@ export const generateODPdf = (data) => {
 
     yPos += boxHeight - 22 + 10;
 
+    // ============ TEAM MEMBERS SECTION ============
+    if (parsedTeamMembers.length > 0) {
+        yPos += 5;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.text('Team Members:', margin, yPos);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        const teamText = parsedTeamMembers.join(', ');
+        const splitTeam = doc.splitTextToSize(teamText, pageWidth - 2 * margin - 30);
+        doc.text(splitTeam, margin + 30, yPos);
+
+        yPos += splitTeam.length * 5 + 8;
+    } else {
+        yPos += 5;
+    }
+
     // Body Paragraph 2
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(10);
-    const para2 = `We kindly request you to grant the necessary On-Duty permission to the above-mentioned student for attending this symposium. The student's participation and presence has been verified and confirmed.`;
+    const para2 = `We kindly request you to grant the necessary On-Duty permission to the above-mentioned student${parsedTeamMembers.length > 0 ? ' and their team members' : ''} for attending this symposium. The student's participation and presence has been verified and confirmed.`;
     const splitPara2 = doc.splitTextToSize(para2, pageWidth - 2 * margin);
     doc.text(splitPara2, margin, yPos);
     yPos += splitPara2.length * 5 + 6;

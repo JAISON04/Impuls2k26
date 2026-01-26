@@ -61,7 +61,8 @@ const Profile = () => {
             year: event.year,
             eventName: event.eventName,
             refId: event.id,
-            registeredAt: event.registeredAt?.toDate ? event.registeredAt.toDate().toLocaleDateString() : 'N/A'
+            registeredAt: event.registeredAt?.toDate ? event.registeredAt.toDate().toLocaleDateString() : 'N/A',
+            teamMembers: event.teamMembers || []
         });
     };
 
