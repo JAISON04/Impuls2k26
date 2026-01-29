@@ -200,7 +200,7 @@ export const generateODPdf = (data) => {
     const para2 = `We kindly request you to grant the necessary On-Duty permission to the above-mentioned student${parsedTeamMembers.length > 0 ? ' and their team members' : ''} for attending this symposium. The student's participation and presence has been verified and confirmed.`;
     const splitPara2 = doc.splitTextToSize(para2, pageWidth - 2 * margin);
     doc.text(splitPara2, margin, yPos);
-    yPos += splitPara2.length * 5 + 6;
+    yPos += splitPara2.length * 5 + 1;
 
     // Body Paragraph 3
     const para3 = `We appreciate your cooperation and support in encouraging students to participate in such technical events that enhance their knowledge and skills.`;
