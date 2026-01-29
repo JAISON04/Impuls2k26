@@ -19,7 +19,7 @@ import ev from '../assets/images/imageev.png';
 import renewable from '../assets/images/imagerenewable.png';
 import kuka from '../assets/images/imagekuka.png';
 import entrepreneurship from '../assets/images/imageentre.png';
-import astronomy from '../assets/images/imageentre.png';
+
 import videoEdit from '../assets/images/imagevideo.png';
 import startup from '../assets/images/imagestartuppitch.png';
 
@@ -46,7 +46,7 @@ export const imageMap = {
     'E-Vehicle': ev,
     'Renewable Energy': renewable,
     'Code to Cloud: ESP Workshop': iot,
-    'Astronomy in Action': astronomy,
+
     'Building a MicroSaaS': startup,
     'Video Editing Workshop': videoEdit,
 };

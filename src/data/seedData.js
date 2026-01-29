@@ -19,7 +19,7 @@ import ev from '../assets/images/imageev.png';
 import renewable from '../assets/images/imagerenewable.png';
 import kuka from '../assets/images/imagekuka.png';
 import entrepreneurship from '../assets/images/imageentre.png'; // Reusing for MicroSaaS
-import astronomy from '../assets/images/imageentre.png'; // Reusing for Astronomy
+
 import videoEdit from '../assets/images/imagevideo.png';
 import startup from '../assets/images/imagestartuppitch.png'; // Alternative for MicroSaaS
 
@@ -235,7 +235,7 @@ export const eventsData = {
                 'No heavy editing allowed.',
                 'Submit before deadline.'
             ],
-            price: 30,
+            price: 0,
             isTeamEvent: false,
             minTeamSize: 1,
             maxTeamSize: 1
@@ -254,7 +254,7 @@ export const eventsData = {
                 'Submit in high resolution.',
                 'Judges decision is final.'
             ],
-            price: 30,
+            price: 0,
             isTeamEvent: false,
             minTeamSize: 1,
             maxTeamSize: 1
@@ -272,7 +272,7 @@ export const eventsData = {
                 'Max duration: 2 minutes.',
                 'Judges decision is final.'
             ],
-            price: 30,
+            price: 0,
             isTeamEvent: false,
             minTeamSize: 1,
             maxTeamSize: 1
@@ -350,25 +350,7 @@ export const workshopsData = [
         ],
         price: 150
     },
-    {
-        id: 5,
-        title: 'Astronomy in Action',
-        image: astronomy,
-        desc: 'Explore the boundless universe.',
-        details: 'Hosted by Club Callisto. Dive into the world of astronomy. Learn about celestial mechanics, telescopes, and the mysteries of the deep space.',
-        club: 'Club Callisto',
-        coordinators: [
-            { name: 'Muthu Malesh M', contact: '90928 43831' },
-            { name: 'Yazhini', contact: '95660 24632' }
-        ],
-        rules: [
-            'Interest in space science required.',
-            'Interactive session.',
-            'Laptop are Mandatory.',
-            'Certificates provided upon completion.'
-        ],
-        price: 150
-    },
+
     {
         id: 6,
         title: 'Building a MicroSaaS',

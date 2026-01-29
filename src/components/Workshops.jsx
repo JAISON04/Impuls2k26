@@ -188,7 +188,7 @@ const Workshops = ({ previewMode = false }) => {
                     id: doc.id,
                     ...doc.data(),
                     image: getImageByTitle(doc.data().title) // Resolve image
-                }));
+                })).filter(workshop => !workshop.title.toLowerCase().includes('astronomy'));
                 setWorkshops(data);
             } catch (error) {
                 console.error("Error fetching workshops:", error);
