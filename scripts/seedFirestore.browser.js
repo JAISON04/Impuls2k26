@@ -228,7 +228,7 @@
                 'No heavy editing allowed.',
                 'Submit before deadline.'
             ],
-            price: 30,
+            price: 0,
             isTeamEvent: false,
             minTeamSize: 1,
             maxTeamSize: 1
@@ -245,7 +245,7 @@
                 'Submit in high resolution.',
                 'Judges decision is final.'
             ],
-            price: 30,
+            price: 0,
             isTeamEvent: false,
             minTeamSize: 1,
             maxTeamSize: 1
@@ -262,7 +262,7 @@
                 'Max duration: 2 minutes.',
                 'Judges decision is final.'
             ],
-            price: 30,
+            price: 0,
             isTeamEvent: false,
             minTeamSize: 1,
             maxTeamSize: 1
@@ -339,25 +339,7 @@
 
             price: 150
         },
-        {
-            title: 'Astronomy in Action',
-            category: 'Workshop',
-            desc: 'Explore the boundless universe.',
-            details: 'Hosted by Club Callisto. Dive into the world of astronomy. Learn about celestial mechanics, telescopes, and the mysteries of the deep space.',
-            club: 'Club Callisto',
-            coordinators: [
-                { name: 'Muthu Malesh M', contact: '90928 43831' },
-                { name: 'Yazhini', contact: '95660 24632' }
-            ],
-            rules: [
-                'Interest in space science required.',
-                'Interactive session.',
-                'Laptop are Mandatory.',
-                'Certificates provided upon completion.'
-            ],
 
-            price: 150
-        },
         {
             title: 'Building a MicroSaaS',
             category: 'Workshop',
