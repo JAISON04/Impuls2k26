@@ -27,7 +27,7 @@ export const EventDetailsModal = ({ event, onClose }) => {
             state: {
                 eventName: event.title,
                 category: 'Event',
-                price: event.price || 5,
+                price: event.price ?? 5,
                 isTeamEvent: event.isTeamEvent || false,
                 minTeamSize: event.minTeamSize || 1,
                 maxTeamSize: event.maxTeamSize || 1,

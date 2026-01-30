@@ -25,7 +25,7 @@ const WorkshopDetailsModal = ({ workshop, onClose }) => {
             state: {
                 eventName: workshop.title,
                 category: 'Workshop',
-                price: workshop.price || 5,
+                price: workshop.price ?? 5,
                 isTeamEvent: workshop.isTeamEvent || false,
                 minTeamSize: workshop.minTeamSize || 1,
                 maxTeamSize: workshop.maxTeamSize || 1,
