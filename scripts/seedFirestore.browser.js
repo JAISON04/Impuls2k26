@@ -285,7 +285,7 @@
                 'Certificates provided upon completion.'
             ],
 
-            price: 150
+            price: 100
         },
         {
             title: 'E-Vehicle',
@@ -302,7 +302,7 @@
                 'Certificates provided upon completion.'
             ],
 
-            price: 150
+            price: 100
         },
         {
             title: 'Renewable Energy',
@@ -319,7 +319,7 @@
                 'Certificates provided upon completion.'
             ],
 
-            price: 150
+            price: 100
         },
         {
             title: 'Code to Cloud: ESP Workshop',
@@ -337,7 +337,7 @@
                 'Certificates provided upon completion.'
             ],
 
-            price: 150
+            price: 100
         },
 
         {
@@ -352,7 +352,7 @@
                 'Certificates provided upon completion.'
             ],
 
-            price: 150
+            price: 100
         },
         {
             title: 'Video Editing Workshop',
@@ -366,7 +366,7 @@
                 'Certificates provided upon completion.'
             ],
 
-            price: 150
+            price: 100
         }
     ];
 
