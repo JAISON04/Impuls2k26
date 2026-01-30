@@ -53,11 +53,14 @@ const Register = () => {
 
     // Calculate total price based on team size
     const totalPrice = useMemo(() => {
+        if (category === 'Workshop') {
+            return 100;
+        }
         if (location.state?.isFixedPrice) {
             return parseFloat(price) || 0;
         }
         return teamCount * (parseFloat(price) || 0);
-    }, [teamCount, price, location.state]);
+    }, [teamCount, price, location.state, category]);
 
     useEffect(() => {
         /* 

@@ -296,7 +296,7 @@ export const workshopsData = [
             'Software installation guide provided.',
             'Certificates provided upon completion.'
         ],
-        price: 150
+        price: 100
     },
     {
         id: 2,
@@ -313,7 +313,7 @@ export const workshopsData = [
             'Hands-on session included.',
             'Certificates provided upon completion.'
         ],
-        price: 150
+        price: 100
     },
     {
         id: 3,
@@ -330,7 +330,7 @@ export const workshopsData = [
             'Interactive session with experts.',
             'Certificates provided upon completion.'
         ],
-        price: 150
+        price: 100
     },
     {
         id: 4,
@@ -348,7 +348,7 @@ export const workshopsData = [
             'ESP32/8266 kits provided for session.',
             'Certificates provided upon completion.'
         ],
-        price: 150
+        price: 100
     },
 
     {
@@ -363,7 +363,7 @@ export const workshopsData = [
             'No prior business knowledge needed.',
             'Certificates provided upon completion.'
         ],
-        price: 150
+        price: 100
     },
     {
         id: 7,
@@ -377,6 +377,6 @@ export const workshopsData = [
             'Basic editing knowledge is a plus.',
             'Certificates provided upon completion.'
         ],
-        price: 150
+        price: 100
     }
 ];

@@ -251,7 +251,7 @@ const workshopsData = [
             'Software installation guide provided.',
             'Certificates provided upon completion.'
         ],
-        price: 50
+        price: 100
     },
     {
         title: 'E-Vehicle',
@@ -268,7 +268,7 @@ const workshopsData = [
             'Hands-on session included.',
             'Certificates provided upon completion.'
         ],
-        price: 50
+        price: 100
     },
     {
         title: 'Renewable Energy',
@@ -285,7 +285,7 @@ const workshopsData = [
             'Interactive session with experts.',
             'Certificates provided upon completion.'
         ],
-        price: 50
+        price: 100
     },
     {
         title: 'Code to Cloud: ESP Workshop',
@@ -303,7 +303,7 @@ const workshopsData = [
             'ESP32/8266 kits provided for session.',
             'Certificates provided upon completion.'
         ],
-        price: 50
+        price: 100
     },
     {
         title: 'Astronomy in Action',
@@ -317,7 +317,7 @@ const workshopsData = [
             'Interactive session.',
             'Certificates provided upon completion.'
         ],
-        price: 50
+        price: 100
     },
     {
         title: 'Building a MicroSaaS',
@@ -330,7 +330,7 @@ const workshopsData = [
             'No prior business knowledge needed.',
             'Certificates provided upon completion.'
         ],
-        price: 50
+        price: 100
     },
     {
         title: 'Video Editing Workshop',
@@ -343,7 +343,7 @@ const workshopsData = [
             'Basic editing knowledge is a plus.',
             'Certificates provided upon completion.'
         ],
-        price: 50
+        price: 100
     }
 ];
 
