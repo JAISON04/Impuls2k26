@@ -26,8 +26,8 @@ const Register = () => {
         maxTeamSize = 1
     } = location.state || { eventName: '', category: 'Event', price: 0 };
 
-    // Force price to 100 for Workshops
-    const price = category === 'Workshop' ? 100 : initialPrice;
+    // Use initialPrice from state (which comes from seedData)
+    const price = initialPrice;
 
     const [formData, setFormData] = useState({
         name: '',
@@ -56,9 +56,7 @@ const Register = () => {
 
     // Calculate total price based on team size
     const totalPrice = useMemo(() => {
-        if (category === 'Workshop') {
-            return 100;
-        }
+
         if (location.state?.isFixedPrice) {
             return parseFloat(price) || 0;
         }

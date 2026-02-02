@@ -44,7 +44,7 @@
                 'Time limit: 45 minutes.',
                 'Judges decision is final.'
             ],
-            price: 50,
+            price: 0,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 2
@@ -64,7 +64,7 @@
                 'Circuit diagram will be provided.',
                 'Judges decision is final.'
             ],
-            price: 50,
+            price: 0,
             isTeamEvent: false,
             minTeamSize: 1,
             maxTeamSize: 1
@@ -84,7 +84,7 @@
                 'Quiz specific rules will be announced on spot.',
                 'Judges decision is final.'
             ],
-            price: 50,
+            price: 0,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 3
@@ -104,7 +104,7 @@
                 'Presentation time: 7 mins + 3 mins Q&A.',
                 'Judges decision is final.'
             ],
-            price: 50,
+            price: 0,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 3
@@ -124,7 +124,7 @@
                 'Presentation time: 7 mins + 3 mins Q&A.',
                 'Judges decision is final.'
             ],
-            price: 50,
+            price: 0,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 3
@@ -144,7 +144,7 @@
                 'Only KiCad software is allowed.',
                 'Judges decision is final.'
             ],
-            price: 100,
+            price: 0,
             isTeamEvent: true,
             isFixedPrice: true,
             minTeamSize: 1,
@@ -165,7 +165,7 @@
                 'Laptop required.',
                 'Judges decision is final.'
             ],
-            price: 50,
+            price: 0,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 2
@@ -189,7 +189,7 @@
                 'Judges’ decisions are final.',
                 'Malpractice leads to disqualification.'
             ],
-            price: 50,
+            price: 0,
             isTeamEvent: true,
             minTeamSize: 2,
             maxTeamSize: 3
@@ -208,7 +208,7 @@
                 'Critical thinking required.',
                 'Judges decision is final.'
             ],
-            price: 50,
+            price: 0,
             isTeamEvent: true,
             minTeamSize: 2,
             maxTeamSize: 4
@@ -285,7 +285,7 @@
                 'Certificates provided upon completion.'
             ],
 
-            price: 100
+            price: 0
         },
         {
             title: 'E-Vehicle',
@@ -302,7 +302,7 @@
                 'Certificates provided upon completion.'
             ],
 
-            price: 100
+            price: 0
         },
         {
             title: 'Renewable Energy',
@@ -319,7 +319,7 @@
                 'Certificates provided upon completion.'
             ],
 
-            price: 100
+            price: 0
         },
         {
             title: 'Code to Cloud: ESP Workshop',
@@ -337,7 +337,7 @@
                 'Certificates provided upon completion.'
             ],
 
-            price: 100
+            price: 0
         },
 
         {
@@ -352,7 +352,7 @@
                 'Certificates provided upon completion.'
             ],
 
-            price: 100
+            price: 0
         },
         {
             title: 'Video Editing Workshop',
@@ -366,7 +366,7 @@
                 'Certificates provided upon completion.'
             ],
 
-            price: 100
+            price: 0
         }
     ];
 
