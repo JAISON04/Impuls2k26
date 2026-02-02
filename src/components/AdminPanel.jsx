@@ -239,13 +239,9 @@ const AdminPanel = () => {
         }
     };
 
-    const handleSendODEmail = async (student) => {
-        if (!confirm(`Send OD Letter via email to ${student.name}?`)) return;
-
-        setSendingOD(student.id);
+    const sendODEmailToStudent = async (student) => {
         try {
             // 1. Generate PDF Base64
-            // Pass plain object with returnBase64: true and refId for consistent reference number
             const pdfBase64 = generateODPdf({
                 ...student,
                 refId: student.id,
@@ -254,12 +250,11 @@ const AdminPanel = () => {
             });
 
             // 2. Call API
-            // Use relative path '/api/send-od-email' for Vercel
             const response = await fetch('/api/send-od-email', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'x-api-key': 'impulse2026secure' // Matches CLIENT_KEY in api/send-od-email.js
+                    'x-api-key': 'impulse2026secure'
                 },
                 body: JSON.stringify({
                     to: student.email,
@@ -271,15 +266,63 @@ const AdminPanel = () => {
 
             const result = await response.json();
             if (!result.success) throw new Error(result.error);
-
-            alert(`✅ OD Email sent to ${student.email}`);
-
+            return { success: true };
         } catch (err) {
-            console.error("Error sending OD email:", err);
-            alert(`❌ Failed to send email: ${err.message}`);
-        } finally {
-            setSendingOD(null);
+            console.error(`Error sending to ${student.email}:`, err);
+            return { success: false, error: err.message };
         }
+    };
+
+    const handleSendODEmail = async (student) => {
+        if (!confirm(`Send OD Letter via email to ${student.name}?`)) return;
+
+        setSendingOD(student.id);
+        const result = await sendODEmailToStudent(student);
+        setSendingOD(null);
+
+        if (result.success) {
+            alert(`✅ OD Email sent to ${student.email}`);
+        } else {
+            alert(`❌ Failed to send email: ${result.error}`);
+        }
+    };
+
+    const [isSendingAll, setIsSendingAll] = useState(false);
+    const [sendProgress, setSendProgress] = useState({ current: 0, total: 0, successes: 0, failures: 0 });
+
+    const handleSendODToAll = async () => {
+        const confirmMsg = searchTerm
+            ? `Send OD Letters to ALL ${filteredData.length} filtered participants?`
+            : `Send OD Letters to ALL ${registrations.length} participants?`;
+
+        if (!confirm(confirmMsg + "\n\nThis process may take a while. Please do not close the tab.")) return;
+
+        setIsSendingAll(true);
+        const total = filteredData.length;
+        setSendProgress({ current: 0, total, successes: 0, failures: 0 });
+
+        let successes = 0;
+        let failures = 0;
+
+        for (let i = 0; i < total; i++) {
+            const student = filteredData[i];
+            setSendProgress(prev => ({ ...prev, current: i + 1 }));
+
+            // Scroll to row if possible (optional, might be too jittery)
+
+            const result = await sendODEmailToStudent(student);
+            if (result.success) {
+                successes++;
+            } else {
+                failures++;
+            }
+
+            // Small delay to prevent rate limiting
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+
+        setIsSendingAll(false);
+        alert(`Bulk Send Complete!\n\n✅ Sent: ${successes}\n❌ Failed: ${failures}`);
     };
 
     const handleSeedDB = async () => {
@@ -401,6 +444,14 @@ const AdminPanel = () => {
                             className="flex items-center gap-2 bg-electric-600 hover:bg-electric-500 text-navy-950 font-bold px-6 py-2.5 rounded-xl transition-all shadow-[0_0_15px_rgba(45,212,191,0.2)]"
                         >
                             <Download size={20} /> Export Excel
+                        </button>
+                        <button
+                            onClick={handleSendODToAll}
+                            disabled={isSendingAll}
+                            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl transition-all shadow-[0_0_15px_rgba(6,182,212,0.2)] font-bold ${isSendingAll ? 'bg-cyan-900 text-gray-400 cursor-not-allowed' : 'bg-cyan-600 hover:bg-cyan-500 text-white'}`}
+                        >
+                            {isSendingAll ? <Loader2 className="animate-spin" size={20} /> : <FileText size={20} />}
+                            {isSendingAll ? `Sending ${sendProgress.current}/${sendProgress.total}` : 'Send OD to All'}
                         </button>
                         <button
                             onClick={() => setIsModalOpen(true)}
