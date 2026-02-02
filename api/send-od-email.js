@@ -45,6 +45,15 @@ export default async function handler(req, res) {
               Dear <strong style="color: #00d4ff;">${name}</strong>,<br><br>
               Your On-Duty letter for participating in <strong style="color: #ff00ff;">${event}</strong> at IMPULSE 2026 is attached to this email.
             </p>
+
+            ${req.body.teamMembers && req.body.teamMembers.length > 0 ? `
+            <div style="margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
+              <h4 style="color: #e0e0e0; margin: 0 0 10px 0; font-size: 16px;">Team Members:</h4>
+              <ul style="color: #ccc; margin: 0; padding-left: 20px;">
+                ${req.body.teamMembers.map(m => `<li>${typeof m === 'string' ? m : (m.name || 'Member')}</li>`).join('')}
+              </ul>
+            </div>
+            ` : ''}
           </div>
           
           <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 25px; margin-bottom: 30px;">

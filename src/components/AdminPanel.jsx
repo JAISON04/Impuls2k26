@@ -260,6 +260,7 @@ const AdminPanel = () => {
                     to: student.email,
                     name: student.name,
                     event: student.eventName,
+                    teamMembers: student.teamMembers || [], // Pass team members
                     pdfBase64: pdfBase64
                 })
             });
