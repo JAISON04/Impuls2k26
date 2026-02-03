@@ -41,7 +41,7 @@ export const eventsData = {
                 'Time limit: 45 minutes.',
                 'Judges decision is final.'
             ],
-            price: 0,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 2
@@ -62,7 +62,7 @@ export const eventsData = {
                 'Circuit diagram will be provided.',
                 'Judges decision is final.'
             ],
-            price: 0,
+            price: 50,
             isTeamEvent: false,
             minTeamSize: 1,
             maxTeamSize: 1
@@ -83,7 +83,7 @@ export const eventsData = {
                 'Quiz specific rules will be announced on spot.',
                 'Judges decision is final.'
             ],
-            price: 0,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 3
@@ -105,7 +105,7 @@ export const eventsData = {
                 'Presentation time: 7 mins + 3 mins Q&A.',
                 'Judges decision is final.'
             ],
-            price: 0,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 3,
@@ -127,7 +127,7 @@ export const eventsData = {
                 'Presentation time: 7 mins + 3 mins Q&A.',
                 'Judges decision is final.'
             ],
-            price: 0,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 3
@@ -148,7 +148,7 @@ export const eventsData = {
                 'Only KiCad software is allowed.',
                 'Judges decision is final.'
             ],
-            price: 0,
+            price: 50,
             isTeamEvent: true,
             isFixedPrice: true,
             minTeamSize: 1,
@@ -170,7 +170,7 @@ export const eventsData = {
                 'Laptop required.',
                 'Judges decision is final.'
             ],
-            price: 0,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 2
@@ -195,7 +195,7 @@ export const eventsData = {
                 'Judges’ decisions are final.',
                 'Malpractice leads to disqualification.'
             ],
-            price: 0,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 2,
             maxTeamSize: 3
@@ -215,7 +215,7 @@ export const eventsData = {
                 'Critical thinking required.',
                 'Judges decision is final.'
             ],
-            price: 0,
+            price: 50,
             isTeamEvent: true,
             minTeamSize: 2,
             maxTeamSize: 4
@@ -297,7 +297,7 @@ export const workshopsData = [
             'Software installation guide provided.',
             'Certificates provided upon completion.'
         ],
-        price: 0
+        price: 100
     },
     {
         id: 2,
@@ -314,7 +314,7 @@ export const workshopsData = [
             'Hands-on session included.',
             'Certificates provided upon completion.'
         ],
-        price: 0
+        price: 100
     },
     {
         id: 3,
@@ -331,7 +331,7 @@ export const workshopsData = [
             'Interactive session with experts.',
             'Certificates provided upon completion.'
         ],
-        price: 0
+        price: 100
     },
     {
         id: 4,
@@ -349,7 +349,7 @@ export const workshopsData = [
             'ESP32/8266 kits provided for session.',
             'Certificates provided upon completion.'
         ],
-        price: 0
+        price: 100
     },
 
     {
@@ -364,7 +364,7 @@ export const workshopsData = [
             'No prior business knowledge needed.',
             'Certificates provided upon completion.'
         ],
-        price: 0
+        price: 100
     },
     {
         id: 7,
@@ -378,6 +378,6 @@ export const workshopsData = [
             'Basic editing knowledge is a plus.',
             'Certificates provided upon completion.'
         ],
-        price: 0
+        price: 100
     }
 ];
