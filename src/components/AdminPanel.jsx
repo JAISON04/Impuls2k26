@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, orderBy, query, addDoc, serverTimestamp, setDoc, doc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, addDoc, serverTimestamp, setDoc, doc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { db, functions } from '../firebase';
 import { eventsData, workshopsData } from '../data/seedData';
@@ -326,6 +326,58 @@ const AdminPanel = () => {
         alert(`Bulk Send Complete!\n\n✅ Sent: ${successes}\n❌ Failed: ${failures}`);
     };
 
+    const [isEnablingODAll, setIsEnablingODAll] = useState(false);
+
+    const handleEnableODAll = async () => {
+        const confirmMsg = searchTerm
+            ? `Enable OD Download for ALL ${filteredData.length} filtered participants?`
+            : `Enable OD Download for ALL ${registrations.length} participants?`;
+
+        if (!confirm(confirmMsg + "\n\nThis will allow them to download the OD letter from their profile.")) return;
+
+        setIsEnablingODAll(true);
+        const batchSize = 500;
+        const total = filteredData.length;
+        let processed = 0;
+
+        try {
+            // Process in chunks of 500 (Firestore batch limit)
+            for (let i = 0; i < total; i += batchSize) {
+                const chunk = filteredData.slice(i, i + batchSize);
+                const batch = writeBatch(db);
+
+                chunk.forEach(student => {
+                    const regRef = doc(db, 'registrations', student.id);
+                    batch.set(regRef, {
+                        odGenerated: true,
+                        odGeneratedAt: serverTimestamp()
+                    }, { merge: true });
+                });
+
+                await batch.commit();
+                processed += chunk.length;
+                console.log(`Processed ${processed}/${total} OD enables`);
+            }
+
+            // Update local state
+            const updatedIds = new Set(filteredData.map(r => r.id));
+            setRegistrations(prev => prev.map(r =>
+                updatedIds.has(r.id) ? { ...r, odGenerated: true } : r
+            ));
+            setFilteredData(prev => prev.map(r =>
+                updatedIds.has(r.id) ? { ...r, odGenerated: true } : r
+            ));
+
+            alert(`✅ Successfully enabled OD download for ${processed} participants.`);
+
+        } catch (err) {
+            console.error("Error bulk enabling OD:", err);
+            alert(`❌ Failed to enable ODs: ${err.message}`);
+        } finally {
+            setIsEnablingODAll(false);
+        }
+    };
+
     const handleSeedDB = async () => {
         if (!confirm("This will overwrite existing events/workshops in DB. Continue?")) return;
         setLoading(true);
@@ -453,6 +505,14 @@ const AdminPanel = () => {
                         >
                             {isSendingAll ? <Loader2 className="animate-spin" size={20} /> : <FileText size={20} />}
                             {isSendingAll ? `Sending ${sendProgress.current}/${sendProgress.total}` : 'Send OD to All'}
+                        </button>
+                        <button
+                            onClick={handleEnableODAll}
+                            disabled={isEnablingODAll}
+                            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl transition-all shadow-[0_0_15px_rgba(34,197,94,0.2)] font-bold ${isEnablingODAll ? 'bg-green-900 text-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500 text-white'}`}
+                        >
+                            {isEnablingODAll ? <Loader2 className="animate-spin" size={20} /> : <CheckCircle size={20} />}
+                            {isEnablingODAll ? 'Enabling...' : 'Enable All ODs'}
                         </button>
                         <button
                             onClick={() => setIsModalOpen(true)}
