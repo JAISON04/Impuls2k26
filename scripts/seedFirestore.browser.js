@@ -109,6 +109,7 @@
             minTeamSize: 1,
             maxTeamSize: 3,
             maxTeamSize: 3,
+            isOpen: false
         },
         {
             title: 'Project Presentation',
@@ -128,7 +129,8 @@
             price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
-            maxTeamSize: 3
+            maxTeamSize: 3,
+            isOpen: false
         },
         {
             title: 'E-Cadathon',

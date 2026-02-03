@@ -109,7 +109,8 @@ export const eventsData = {
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 3,
-            maxTeamSize: 3
+            maxTeamSize: 3,
+            isOpen: false
         },
         {
             id: 5,
@@ -130,7 +131,8 @@ export const eventsData = {
             price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
-            maxTeamSize: 3
+            maxTeamSize: 3,
+            isOpen: false
         },
         {
             id: 6,
