@@ -64,7 +64,7 @@
                 'Circuit diagram will be provided.',
                 'Judges decision is final.'
             ],
-            price: 50,
+            price: 0,
             isTeamEvent: false,
             minTeamSize: 1,
             maxTeamSize: 1
@@ -108,8 +108,6 @@
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 3,
-            maxTeamSize: 3,
-            isOpen: false
         },
         {
             title: 'Project Presentation',
@@ -192,7 +190,7 @@
                 'Judges’ decisions are final.',
                 'Malpractice leads to disqualification.'
             ],
-            price: 50,
+            price: 0,
             isTeamEvent: true,
             minTeamSize: 2,
             maxTeamSize: 3
