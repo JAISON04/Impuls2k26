@@ -218,7 +218,7 @@ const Events = ({ previewMode = false }) => {
                     id: doc.id,
                     ...doc.data(),
                     image: getImageByTitle(doc.data().title), // Resolve image
-                    isOpen: doc.data().title === 'Paper Presentation' ? false : (doc.data().isOpen ?? true)
+                    isOpen: doc.data().isOpen ?? true
                 }));
 
                 // Fetch Online Events

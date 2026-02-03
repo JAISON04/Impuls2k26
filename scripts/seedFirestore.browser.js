@@ -108,7 +108,7 @@
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 3,
-            isOpen: false
+            maxTeamSize: 3,
         },
         {
             title: 'Project Presentation',
