@@ -62,7 +62,7 @@ export const eventsData = {
                 'Circuit diagram will be provided.',
                 'Judges decision is final.'
             ],
-            price: 50,
+            price: 0,
             isTeamEvent: false,
             minTeamSize: 1,
             maxTeamSize: 1
@@ -197,7 +197,7 @@ export const eventsData = {
                 'Judges’ decisions are final.',
                 'Malpractice leads to disqualification.'
             ],
-            price: 50,
+            price: 0,
             isTeamEvent: true,
             minTeamSize: 2,
             maxTeamSize: 3
