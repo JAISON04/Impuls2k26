@@ -47,7 +47,7 @@ const RegistrationClosedPopup = ({ onClose }) => (
         <div className="text-5xl mb-4">⚠️</div>
         <h2 className="text-2xl font-bold mb-4">Registration Closed</h2>
         <p className="text-lg mb-6 opacity-90">
-          Online registration for all events and workshops is closed. Offline registration will be available at the college.
+          Online registration for all events and workshops is now closed. Offline registration will be available at the college venue, subject to availability.
         </p>
         <button
           onClick={onClose}
