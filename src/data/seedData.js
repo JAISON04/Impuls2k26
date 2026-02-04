@@ -382,6 +382,7 @@ export const workshopsData = [
             'Basic editing knowledge is a plus.',
             'Certificates provided upon completion.'
         ],
-        price: 100
+        price: 100,
+        isOpen: false
     }
 ];

@@ -371,7 +371,8 @@
                 'Certificates provided upon completion.'
             ],
 
-            price: 100
+            price: 100,
+            isOpen: false
         }
     ];
 
