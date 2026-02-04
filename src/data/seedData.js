@@ -44,7 +44,8 @@ export const eventsData = {
             price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
-            maxTeamSize: 2
+            maxTeamSize: 2,
+            isOpen: false
         },
         {
             id: 2,
@@ -65,7 +66,8 @@ export const eventsData = {
             price: 0,
             isTeamEvent: false,
             minTeamSize: 1,
-            maxTeamSize: 1
+            maxTeamSize: 1,
+            isOpen: false
         },
         {
             id: 3,
@@ -109,7 +111,8 @@ export const eventsData = {
             price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
-            maxTeamSize: 3
+            maxTeamSize: 3,
+            isOpen: false
         },
         {
             id: 5,
@@ -154,7 +157,8 @@ export const eventsData = {
             isFixedPrice: true,
             minTeamSize: 1,
             maxTeamSize: 3,
-            externalUrl: 'https://unstop.com/competitions/e-cadathon-impulse-2026-chennai-institute-of-technology-1621391'
+            externalUrl: 'https://unstop.com/competitions/e-cadathon-impulse-2026-chennai-institute-of-technology-1621391',
+            isOpen: false
         },
         {
             id: 7,
@@ -174,7 +178,8 @@ export const eventsData = {
             price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
-            maxTeamSize: 2
+            maxTeamSize: 2,
+            isOpen: false
         },
         {
             id: 8,
@@ -199,7 +204,8 @@ export const eventsData = {
             price: 0,
             isTeamEvent: true,
             minTeamSize: 2,
-            maxTeamSize: 3
+            maxTeamSize: 3,
+            isOpen: false
         },
         {
             id: 9,
@@ -241,7 +247,8 @@ export const eventsData = {
             price: 0,
             isTeamEvent: false,
             minTeamSize: 1,
-            maxTeamSize: 1
+            maxTeamSize: 1,
+            isOpen: false
         },
         {
             id: 102,
@@ -260,7 +267,8 @@ export const eventsData = {
             price: 0,
             isTeamEvent: false,
             minTeamSize: 1,
-            maxTeamSize: 1
+            maxTeamSize: 1,
+            isOpen: false
         },
         {
             id: 103,
@@ -278,7 +286,8 @@ export const eventsData = {
             price: 0,
             isTeamEvent: false,
             minTeamSize: 1,
-            maxTeamSize: 1
+            maxTeamSize: 1,
+            isOpen: false
         }
     ]
 };
@@ -299,7 +308,9 @@ export const workshopsData = [
             'Software installation guide provided.',
             'Certificates provided upon completion.'
         ],
-        price: 100
+
+        price: 100,
+        isOpen: false
     },
     {
         id: 2,
@@ -334,7 +345,9 @@ export const workshopsData = [
             'Interactive session with experts.',
             'Certificates provided upon completion.'
         ],
-        price: 100
+
+        price: 100,
+        isOpen: false
     },
     {
         id: 4,
@@ -368,7 +381,9 @@ export const workshopsData = [
             'No prior business knowledge needed.',
             'Certificates provided upon completion.'
         ],
-        price: 100
+
+        price: 100,
+        isOpen: false
     },
     {
         id: 7,

@@ -47,7 +47,8 @@
             price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
-            maxTeamSize: 2
+            maxTeamSize: 2,
+            isOpen: false
         },
         {
             title: 'Wiring Challenge',
@@ -67,7 +68,8 @@
             price: 0,
             isTeamEvent: false,
             minTeamSize: 1,
-            maxTeamSize: 1
+            maxTeamSize: 1,
+            isOpen: false
         },
         {
             title: 'Technical Quiz',
@@ -109,6 +111,7 @@
             isTeamEvent: true,
             minTeamSize: 1,
             maxTeamSize: 3,
+            isOpen: false
         },
         {
             title: 'Project Presentation',
@@ -151,7 +154,8 @@
             isFixedPrice: true,
             minTeamSize: 1,
             maxTeamSize: 3,
-            externalUrl: 'https://unstop.com/competitions/e-cadathon-impulse-2026-chennai-institute-of-technology-1621391'
+            externalUrl: 'https://unstop.com/competitions/e-cadathon-impulse-2026-chennai-institute-of-technology-1621391',
+            isOpen: false
         },
         {
             title: 'Last Login',
@@ -170,7 +174,8 @@
             price: 50,
             isTeamEvent: true,
             minTeamSize: 1,
-            maxTeamSize: 2
+            maxTeamSize: 2,
+            isOpen: false
         },
         {
             title: 'Electrolink',
@@ -194,7 +199,8 @@
             price: 0,
             isTeamEvent: true,
             minTeamSize: 2,
-            maxTeamSize: 3
+            maxTeamSize: 3,
+            isOpen: false
         },
         {
             title: 'Blackout Files',
@@ -234,7 +240,8 @@
             price: 0,
             isTeamEvent: false,
             minTeamSize: 1,
-            maxTeamSize: 1
+            maxTeamSize: 1,
+            isOpen: false
         },
         {
             title: 'Poster Designing',
@@ -251,7 +258,8 @@
             price: 0,
             isTeamEvent: false,
             minTeamSize: 1,
-            maxTeamSize: 1
+            maxTeamSize: 1,
+            isOpen: false
         },
         {
             title: 'AI Video Creation',
@@ -268,7 +276,8 @@
             price: 0,
             isTeamEvent: false,
             minTeamSize: 1,
-            maxTeamSize: 1
+            maxTeamSize: 1,
+            isOpen: false
         }
     ];
 
@@ -288,7 +297,8 @@
                 'Certificates provided upon completion.'
             ],
 
-            price: 100
+            price: 100,
+            isOpen: false
         },
         {
             title: 'E-Vehicle',
@@ -323,7 +333,8 @@
                 'Certificates provided upon completion.'
             ],
 
-            price: 100
+            price: 100,
+            isOpen: false
         },
         {
             title: 'Code to Cloud: ESP Workshop',
@@ -357,7 +368,8 @@
                 'Certificates provided upon completion.'
             ],
 
-            price: 100
+            price: 100,
+            isOpen: false
         },
         {
             title: 'Video Editing Workshop',
