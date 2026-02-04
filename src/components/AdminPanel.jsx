@@ -43,7 +43,6 @@ const AdminPanel = () => {
     const [stats, setStats] = useState({
         total: 0,
         unique: 0,
-        revenue: 0,
         eventBreakdown: {}
     });
 
@@ -87,28 +86,15 @@ const AdminPanel = () => {
 
         // Calculate event breakdown
         const breakdown = {};
-        let totalRevenue = 0;
 
         data.forEach(item => {
             const event = item.eventName || 'Unknown';
             breakdown[event] = (breakdown[event] || 0) + (item.teamCount || 1);
-
-            // Calculate revenue carefully
-            if (item.totalPrice) {
-                totalRevenue += parseFloat(item.totalPrice);
-            } else {
-                // Better fallback: lookup current price based on event name, or default to 50 (avg tech event price)
-                const allEvents = [...eventsData.technical, ...eventsData.online, ...workshopsData];
-                const foundEvent = allEvents.find(e => e.title === event);
-                const estimatedPrice = foundEvent ? foundEvent.price : 50;
-                totalRevenue += (item.teamCount || 1) * estimatedPrice;
-            }
         });
 
         setStats({
             total: data.length,
             unique: participants,
-            revenue: totalRevenue,
             eventBreakdown: breakdown
         });
     };
@@ -524,7 +510,7 @@ const AdminPanel = () => {
                 </div>
 
                 {/* Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     {/* Total Registrations */}
                     <div className="bg-navy-900/50 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
                         <div className="flex items-center justify-between mb-4">
@@ -551,19 +537,7 @@ const AdminPanel = () => {
                         <div className="text-xs text-gray-500 mt-2">Based on unique phone numbers</div>
                     </div>
 
-                    {/* Total Revenue */}
-                    <div className="bg-navy-900/50 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-gray-400 text-sm font-bold uppercase tracking-wider">Estimated Revenue</h3>
-                            <div className="p-2 bg-green-500/10 rounded-lg text-green-400">
-                                <IndianRupee size={24} />
-                            </div>
-                        </div>
-                        <div className="text-4xl font-black text-white font-orbitron">
-                            ₹{stats.revenue.toLocaleString()}
-                        </div>
-                        <div className="text-xs text-gray-500 mt-2">Calculated dynamically</div>
-                    </div>
+
                 </div>
 
                 {/* Event Breakdown Section */}
