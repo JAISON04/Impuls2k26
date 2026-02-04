@@ -218,7 +218,8 @@ export const eventsData = {
             price: 50,
             isTeamEvent: true,
             minTeamSize: 2,
-            maxTeamSize: 4
+            maxTeamSize: 4,
+            isOpen: false
         }
     ],
     online: [
@@ -314,7 +315,8 @@ export const workshopsData = [
             'Hands-on session included.',
             'Certificates provided upon completion.'
         ],
-        price: 100
+        price: 100,
+        isOpen: false
     },
     {
         id: 3,
@@ -349,7 +351,8 @@ export const workshopsData = [
             'ESP32/8266 kits provided for session.',
             'Certificates provided upon completion.'
         ],
-        price: 100
+        price: 100,
+        isOpen: false
     },
 
     {

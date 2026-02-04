@@ -123,9 +123,13 @@ const WorkshopDetailsModal = ({ workshop, onClose }) => {
                     {/* Register Button */}
                     <button
                         onClick={handleRegister}
-                        className="w-full py-4 bg-gradient-to-r from-electric-600 to-electric-400 text-navy-950 font-black text-lg uppercase tracking-widest rounded-xl hover:shadow-[0_0_30px_#2dd4bf] hover:scale-[1.02] transition-all"
+                        disabled={workshop.isOpen === false}
+                        className={`w-full py-4 text-navy-950 font-black text-lg uppercase tracking-widest rounded-xl transition-all ${workshop.isOpen === false
+                            ? 'bg-gray-500 cursor-not-allowed text-gray-800'
+                            : 'bg-gradient-to-r from-electric-600 to-electric-400 hover:shadow-[0_0_30px_#2dd4bf] hover:scale-[1.02]'
+                            }`}
                     >
-                        Register Now
+                        {workshop.isOpen === false ? 'Registration Closed' : 'Register Now'}
                     </button>
                 </div>
             </motion.div>

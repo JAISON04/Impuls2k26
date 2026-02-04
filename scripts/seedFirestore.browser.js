@@ -212,7 +212,8 @@
             price: 50,
             isTeamEvent: true,
             minTeamSize: 2,
-            maxTeamSize: 4
+            maxTeamSize: 4,
+            isOpen: false
         }
     ];
 
@@ -303,7 +304,8 @@
                 'Certificates provided upon completion.'
             ],
 
-            price: 100
+            price: 100,
+            isOpen: false
         },
         {
             title: 'Renewable Energy',
@@ -338,7 +340,8 @@
                 'Certificates provided upon completion.'
             ],
 
-            price: 100
+            price: 100,
+            isOpen: false
         },
 
         {
